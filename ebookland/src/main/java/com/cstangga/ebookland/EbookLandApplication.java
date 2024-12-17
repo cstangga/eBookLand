@@ -1,13 +1,13 @@
-package com.example.anywhere;
+package com.cstangga.ebookland;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AnyWhereApplication {
+public class EbookLandApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(AnyWhereApplication.class, args);
+        SpringApplication.run(EbookLandApplication.class, args);
     }
 
 }

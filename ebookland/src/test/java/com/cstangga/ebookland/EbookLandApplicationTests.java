@@ -1,10 +1,10 @@
-package com.example.anywhere;
+package com.cstangga.ebookland;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AnyWhereApplicationTests {
+class EbookLandApplicationTests {
 
     @Test
     void contextLoads() {
