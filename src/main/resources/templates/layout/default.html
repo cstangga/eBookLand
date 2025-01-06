@@ -1,0 +1,24 @@
+<!doctype html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title layout:title-pattern="$LAYOUT_TITLE | $CONTENT_TITLE">eBookLand</title>
+</head>
+
+<body>
+
+<header th:replace="~{fragments/header::headerFragment}"></header>
+
+<main layout:fragment="main"> </main>
+
+<footer th:replace="~{fragments/footer::footerFragment}"></footer>
+
+<script layout:fragment="js"></script>
+
+<!-- 스크립트 부분 -->
+</body>
+</html>
