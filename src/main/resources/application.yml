@@ -29,7 +29,7 @@ spring:
 
 logging:
   level: {
-    root: DEBUG,
+    root: info,
            com.sh: debug ,
            com.zaxxer: INFO,
            org.springframework.boot : INFO,
