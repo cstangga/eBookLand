@@ -64,9 +64,9 @@ public class WebSecurityConfig {
         http.formLogin(configurer -> {
             configurer
                     .loginPage("/auth/login") // GET 방식의 로그인 폼 요청
-                    .loginProcessingUrl("/auth/login") // POST방식으로 로그인 처리
+                    .loginProcessingUrl("/auth/login") // html에서 로그인 POST요청을 하면 이 기능이 실행된다
                     .successHandler(customAuthenticationSuccessHandler()) // 사용자 정의 인증 성공 핸들러 설정
-//                    .defaultSuccessUrl("/", true) // 로그인 성공 후 이동 페이지
+//                    .defaultSuccessUrl("/", true) // 로그인 성공 후 이동 페이지 customAuthenticationSuccessHandler 여기서 해주고 있음
                     .usernameParameter("username") // login.html의 input태그의 name 속성을 입력합니다.
                     .passwordParameter("password") // login.html의 input태그의 name 속성을 입력합니다.
                     .permitAll(); //로그인 페이지는 인증 없이 접근 가능

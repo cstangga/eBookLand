@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Slf4j
 @Controller
 @RequestMapping("/board")
-public class BookController {
+public class BookBoardController {
     @GetMapping("/bookboard")
     public void bookboard() {
         log.info("GET /board/bookboard");

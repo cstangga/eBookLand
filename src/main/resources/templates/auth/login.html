@@ -15,16 +15,18 @@
         <div class="login-content login-content-signin" ng-hide="showSignIn">
             <div>
                 <h2>Log in</h2>
-                <form class="wrapper-box" role="form" ng-submit="login()">
+                <form th:action="@{/auth/login}" method="post" class="wrapper-box" role="form" ng-submit="login()">
                     <input type="email"
                            ng-model="email"
                            class="form-control form-control-email"
                            placeholder="Email address"
+                           name="username"
                            required>
                     <input type="password"
                            ng-model="password"
                            class="form-control form-control-password"
                            placeholder="Password"
+                           name="password"
                            required >
                     <a class="outer-link pull-left" href="#/forgot">Forgot Password</a>
                     <button type="submit" class="btn btn-submit btn-default pull-right">Log in</button>
