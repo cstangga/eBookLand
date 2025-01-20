@@ -16,6 +16,7 @@
     <data-source source="LOCAL" name="ebookland" uuid="a225e281-aa07-4239-ad8b-3271e5a47071">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
+      <remarks>ebookland</remarks>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://localhost:3306/ebooklandDB</jdbc-url>
       <jdbc-additional-properties>

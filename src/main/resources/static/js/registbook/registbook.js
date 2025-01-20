@@ -9,3 +9,19 @@ function duplicateBookNameCheck(input) {
 
     input.value = sanitizedValue;
 }
+
+
+function rentalPrice(input) {
+    // 숫자 외 문자는 제거
+    let value = input.value.replace(/[^0-9]/g, '');
+    // 3자리마다 콤마 추가
+    input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function purchasePrice(input) {
+    // 숫자 외 문자는 제거
+    let value = input.value.replace(/[^0-9]/g, '');
+    // 3자리마다 콤마 추가
+    input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+

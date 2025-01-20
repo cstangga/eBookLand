@@ -43,6 +43,6 @@ public class Purchase {
             joinColumns = @JoinColumn(name = "perchase_id")
             // 지금 entity @Id를 기본키로,tbl_purchase_status 테이블에서 외래키로 잡을거고 그 컬럼 이름을 "perchase_id" 이걸로 할 것이다
     )
-    private Set<Genre> genres=new HashSet<>();
+    private Set<Purchase_status> purchaseStatuses =new HashSet<>();
 
 }

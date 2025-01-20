@@ -1,6 +1,5 @@
 package com.cstangga.ebookland.book.entity;
 
-import com.cstangga.ebookland.member.entity.Authority;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,8 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.stereotype.Controller;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -47,11 +44,20 @@ public class Book {
     @Column(name = "amount") // 재고
     private int amount;
 
+    @Column(name = "bookDetails", columnDefinition = "LONGTEXT")
+    private String bookDetails;
+
+    @Column(name = "bookSummary", columnDefinition = "LONGTEXT")
+    private String bookSummary;
+
     @Column(name = "rental_price") // 렌탈 시 가격
     private double rentalPrice;
 
     @Column(name = "purchase_price") // 구매 시 가격
     private double purchasePrice;
+
+    @Column(name = "image_path") // 이미지 경로
+    private String imagePath;
 
     // 책에 장르
     @Enumerated(EnumType.STRING) // enum을 string으로 관리, int로 관리하면 직관성이 떨어짐
@@ -60,6 +66,14 @@ public class Book {
             name = "tbl_genre",
             joinColumns = @JoinColumn(name = "book_id") //
     )
-    private Set<Genre> genres = new HashSet<>();
+    private Set<BookGenre> bookGenres = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "tbl_transactiontype",
+            joinColumns = @JoinColumn(name = "book_id") //
+    )
+    private Set<BookTransactionType> bookTransactionTypes=new HashSet<>();
 
 }

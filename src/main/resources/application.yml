@@ -9,7 +9,6 @@ spring:
     username: ebookland
     password: ebookland
     driver-class-name: com.mysql.cj.jdbc.Driver
-
     hikari:
       connection-timeout: 30000
       maximum-pool-size: 50
@@ -25,6 +24,9 @@ spring:
         hbm2ddl:
           auto: update
         format_sql: true
+  web:
+    resources:
+      static-locations: /static/
 
 
 logging:
