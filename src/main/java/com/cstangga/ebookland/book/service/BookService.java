@@ -1,6 +1,7 @@
 package com.cstangga.ebookland.book.service;
 
 
+import com.cstangga.ebookland.book.dto.BookModifyDto;
 import com.cstangga.ebookland.book.dto.BookRegistDto;
 import com.cstangga.ebookland.book.entity.Book;
 import com.cstangga.ebookland.book.entity.BookGenre;
@@ -13,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.swing.text.html.parser.Entity;
 import java.io.File;
 import java.io.IOException;
+import java.net.StandardProtocolFamily;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -21,16 +24,15 @@ import java.util.UUID;
 public class BookService {
     private final BookRepository bookRepository;
 
-    public void save(BookRegistDto dto) {
-        Book entity=dto.dtoToEntity();
-        log.info("entity = {}",entity);
-        bookRepository.save(entity);
+    public void save(Book book) {
+        log.info("entity = {}",book);
+        bookRepository.save(book);
     }
 
 
     public String saveImage(MultipartFile bookImage) throws IOException {
         log.info("BookService saveImage");
-        String uploadPath = "C:/eBookLand/src/main/resources/static/bookImage";
+        String uploadPath = "C:/ebookland/src/main/resources/static/bookImage";
 
         File directory = new File(uploadPath);
         if (!directory.exists()) {
@@ -45,8 +47,46 @@ public class BookService {
         File destinationFile = new File(directory, uniqueFilename);
         bookImage.transferTo(destinationFile);
 
-        return uploadPath; // Return the saved file name
+        return "/bookImage/"+uniqueFilename; // Return the saved file name
+    }
+    public void removeBookImage(long bookId) {
+        log.info("BookService removeBookImage");
+        Book book = bookRepository.findBookById(bookId);
+        log.info("book = {}",book);
+        book.setImagePath(null);
+        bookRepository.save(book);
+    }
 
+    public List<Book> findByBookName(String bookName) {
+        return bookRepository.findBookByBookNameContaining(bookName);
+    }
 
+    public List<Book> findByAuthorName(String authorName) {
+        return bookRepository.findBookByAuthorNameContaining(authorName);
+    }
+
+    public Book findByBookId(long bookId) {
+        return bookRepository.findBookById(bookId);
+    }
+
+    public void update(BookModifyDto dto) {
+        Book entity = bookRepository.findBookById(dto.getBookId());
+        entity.setBookName(dto.getBookName());
+        entity.setAuthorName(dto.getAuthorName());
+        entity.setBookDetails(dto.getBookDetails());
+        entity.setBookDetails(dto.getBookDetails());
+        entity.setAmount(dto.getBookAmount());
+        entity.setBookGenres(dto.getBookGenre());
+        entity.setBookTransactionTypes(dto.getBookTransactionType());
+        entity.setPublisherName(dto.getPublisherName());
+        entity.setRentalPrice(dto.getRentalPrice());
+        entity.setPublisherName(dto.getPublisherName());
+        if(!dto.getImagePath().isEmpty())
+            entity.setImagePath(dto.getImagePath());
+        bookRepository.save(entity);
+    }
+
+    public void removeBook(String bookId) {
+        bookRepository.deleteById(bookId);
     }
 }

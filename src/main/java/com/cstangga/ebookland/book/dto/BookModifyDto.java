@@ -9,15 +9,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BookRegistDto {
+public class BookModifyDto {
     private long bookId;
     private String bookName;
     private String authorName;
@@ -31,19 +29,20 @@ public class BookRegistDto {
     private Set<BookTransactionType> bookTransactionType;
     private String imagePath;
 
-    public Book dtoToEntity(){
-        return  Book.builder()
-                .bookName(bookName)
-                .authorName(authorName)
-                .publisherName(publisherName)
-                .amount(bookAmount)
-                .rentalPrice(rentalPrice)
-                .purchasePrice(purchasePrice)
-                .bookTransactionTypes(bookTransactionType)
-                .bookGenres(bookGenre)
-                .imagePath(imagePath)
-                .bookSummary(bookSummary)
-                .bookDetails(bookDetails)
+    public BookModifyDto entityToDto(Book book) {
+        return BookModifyDto.builder()
+                .bookId(book.getId())
+                .bookName(book.getBookName())
+                .authorName(book.getAuthorName())
+                .publisherName(book.getPublisherName())
+                .bookAmount(book.getAmount())
+                .bookGenre(book.getBookGenres())
+                .rentalPrice(book.getAmount())
+                .purchasePrice(book.getPurchasePrice())
+                .bookSummary(book.getBookSummary())
+                .bookDetails(book.getBookDetails())
+                .bookTransactionType(book.getBookTransactionTypes())
+                .imagePath(book.getImagePath())
                 .build();
     }
 }
