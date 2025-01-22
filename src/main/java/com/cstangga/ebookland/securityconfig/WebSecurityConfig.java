@@ -42,16 +42,13 @@ public class WebSecurityConfig {
                     .requestMatchers("/", "/index.html","/auth/login","/member/signup").permitAll()
 
                     // 로그인 안 한 사용자에게 허용되는 페이지
-                    .requestMatchers("/member/**", "/auth/login","/board/freeboard","/board/noticeboard","/board/reviewboard").anonymous()
+                    .requestMatchers("/member/**", "/auth/login","/bookboard/","/noticeboard/").anonymous()
 
                     // 인증된 사용자만 허용 - 로그인 한 사용자를 의미함
-                    .requestMatchers("/board/freeboard/**","/board/noticeboard/**","/board/reviewboard/**").authenticated()
-
-                    // ROLE_SITTER 권한이 있는 사용자만 허용
-//                    .requestMatchers("/petsitter/registerpost", "/petsitter/registerprofile", "/petsitter/startjob").hasRole("SITTER")
+                    .requestMatchers("/noticeboard/**","/bookboard/**").authenticated()
 
                     // ROLE_ADMIN 권한이 있는 사용자만 허용
-                    .requestMatchers("/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/admin/**","/noticeboard/**","/bookboard/**","/noticeboard/**").hasRole("ADMIN")
 
                     // 나머지들은 이렇게 해주세요~
                     .anyRequest().authenticated();

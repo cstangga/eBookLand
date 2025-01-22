@@ -1,7 +1,7 @@
 package com.cstangga.ebookland;
 
-import com.cstangga.ebookland.book.entity.Book;
-import com.cstangga.ebookland.book.service.BookService;
+import com.cstangga.ebookland.bookboard.entity.Book;
+import com.cstangga.ebookland.bookboard.service.BookService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

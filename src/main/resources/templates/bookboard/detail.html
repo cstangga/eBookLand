@@ -1,0 +1,229 @@
+<!doctype html><html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+                     xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+                     layout:decorate="~{layout/default}"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Book Purchase</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5PlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        .row {
+            display: flex;
+            align-items: stretch; /* Make all columns equal in height */
+        }
+
+        .form-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .image-section {
+            width: 70%; /* Set image width to 70% */
+            height: auto; /* Maintain aspect ratio */
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            object-fit: cover;
+        }
+
+        .scrollable-content {
+            flex: 1;
+            overflow-y: auto; /* Enable scrolling for the plot */
+            max-height: 50%; /* Restrict height to parent */
+        }
+
+        .form-container {
+            height: auto; /* Adjust purchase section height automatically */
+        }
+    </style></head><body><main class="container mt-5" layout:fragment="main">
+    <form th:action="@{/bookboard/purchase}" id="purchaseForm" method="post">
+        <div class="row" style="align-items: flex-start;">
+            <!-- Left Column: Book Image -->
+            <div class="col-md-4 form-section text-center">
+                <img id="previewImage" name="imagePath" th:src="@{${bookDto.imagePath}}" alt="Book Cover"
+                     class="image-section">
+            </div>
+
+            <!-- Middle Column: Book Details -->
+            <div class="col-md-4 form-section">
+                <h5>책 이름</h5>
+                <p th:text="${bookDto.bookName}" class="form-control-plaintext"></p>
+
+                <h5>책 저자</h5>
+                <p th:text="${bookDto.authorName}" class="form-control-plaintext"></p>
+
+                <h5>출판사</h5>
+                <p th:text="${bookDto.publisherName}" class="form-control-plaintext"></p>
+
+                <h5>남은 수량</h5>
+                <p th:text="${bookDto.getBookAmount() + ' 권'}" class="form-control-plaintext"></p>
+
+                <h5>장르</h5>
+                <p>
+                    <span th:if="${bookDto.bookGenre.contains(T(com.cstangga.ebookland.bookboard.entity.BookGenre).FANTASY)}">판타지</span>
+                    <span th:if="${bookDto.bookGenre.contains(T(com.cstangga.ebookland.bookboard.entity.BookGenre).HORROR)}">호러</span>
+                </p>
+
+                <h5>판매 상태</h5>
+                <p>
+                    <span th:if="${bookDto.bookTransactionType.contains(T(com.cstangga.ebookland.bookboard.entity.BookTransactionType).RENTAL)}">대여</span>
+                    <span th:if="${bookDto.bookTransactionType.contains(T(com.cstangga.ebookland.bookboard.entity.BookTransactionType).ONLINE_PURCHASE)}">전자 구매</span>
+                </p>
+
+                <h5>가격</h5>
+                <p>
+                    대여: <span th:text="${#numbers.formatInteger(bookDto.rentalPrice, 3,'COMMA')}" id="rentalPrice"></span> 원(1일) <br>
+                    구매: <span th:text="${#numbers.formatInteger(bookDto.purchasePrice, 3,'COMMA')}" id="purchasePrice"></span> 원
+                </p>
+            </div>
+
+            <!-- Right Column: Plot (Top) and Purchase Method (Bottom) -->
+            <div class="col-md-4 form-section">
+                <!-- Plot Section -->
+                <div class="scrollable-content">
+                    <h5>줄거리</h5>
+                    <p th:text="${bookDto.getBookSummary()}"></p>
+                </div>
+
+                <!-- Purchase Section -->
+                <div class="form-container mt-3">
+                    <h5>구매 방식 선택</h5>
+                    <div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="purchaseType" id="rentalOption" value="rental"
+                                   onclick="toggleInput('rental')">
+                            <label class="form-check-label" for="rentalOption">대여</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="purchaseType" id="ebookOption" value="online"
+                                   onclick="toggleInput('ebook')">
+                            <label class="form-check-label" for="ebookOption">전자 구매</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="purchaseType" id="physicalOption" value="offline"
+                                   onclick="toggleInput('physical')">
+                            <label class="form-check-label" for="physicalOption">실물 구매</label>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Inputs -->
+                    <div id="dynamicInput" class="mt-3" style="display: none;">
+                        <label id="dynamicLabel" for="inputField"></label>
+                        <input type="number" class="form-control" id="inputField" name="totalAmount" min="1"
+                               oninput="calculateTotal()" >
+                    </div>
+                    <div>
+                        <p>총 금액: <span id="totalPrice" oninput="calculateTotal()">0</span> 원</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+
+                <button type="button" class="btn btn-primary" onclick="checkInfo()">구매</button>
+                <input type="hidden" th:value="${bookDto.bookId}" name="bookId" id="bookId">
+                <input type="hidden" th:value="${#authentication.principal.member.id}" name="memberId" id="memberId">
+            </div>
+        </div>
+    </form>
+
+    <script th:inline="javascript">
+        function toggleInput(option) {
+            const inputField = document.getElementById('inputField');
+            const dynamicInput = document.getElementById('dynamicInput');
+            const dynamicLabel = document.getElementById('dynamicLabel');
+            inputField.value = ""; // Reset value
+            dynamicInput.style.display = 'block';
+
+            if (option === 'rental') {
+                dynamicLabel.innerText = '대여 기간 (일)';
+                inputField.placeholder = '대여 기간을 입력하세요';
+            } else if (option === 'physical') {
+                dynamicLabel.innerText = '구매 권 수';
+                inputField.placeholder = '구매할 권 수를 입력하세요';
+            } else {
+                dynamicInput.style.display = 'none';
+            }
+
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            const inputField = document.getElementById('inputField');
+            const totalPrice = document.getElementById('totalPrice');
+            const rentalOption = document.getElementById('rentalOption').checked;
+            const physicalOption = document.getElementById('physicalOption').checked;
+
+
+            const rentalPrice = parseInt(/*[[${bookDto.rentalPrice}]]*/);
+            const purchasePrice = parseInt(/*[[${bookDto.purchasePrice}]]*/);
+
+            console.log("대여 값 : "+ rentalPrice+" 구매 값 : "+purchasePrice);
+            console.log("inputField: " + inputField.value);
+
+            const inputValue = parseInt(inputField.value || 0);
+
+            if (rentalOption) {
+                totalPrice.innerText = (rentalPrice * inputValue).toLocaleString();
+            } else if (physicalOption) {
+                totalPrice.innerText = (purchasePrice * inputValue).toLocaleString();
+            } else {
+                totalPrice.innerText = purchasePrice.toLocaleString();
+            }
+        }
+    </script>
+    <script th:inline="javascript">
+        function checkInfo() {
+            const form = document.getElementById('purchaseForm');
+            const bookId = document.getElementById('bookId').value; //
+            const memberId = document.getElementById('memberId').value;
+            const partnerOrderId = crypto.randomUUID();
+            let totalPrice = document.getElementById('totalPrice'); // 전체 가격
+            let inputField= document.getElementById('inputField'); // 몇 권인지
+            const rentalOption = document.getElementById('rentalOption').checked;
+            const physicalOption = document.getElementById('physicalOption').checked;
+            const ebookOption = document.getElementById('ebookOption').checked;
+            const bookName = [[${bookDto.bookName}]];
+            let purchaseType;
+
+            let totalAmount=parseInt(inputField.value || 0);
+            if (rentalOption) {
+                if(totalAmount<=0) {
+                    alert("대여 기간은 최소 1일입니다");
+                    return;
+                }
+                purchaseType="rental";
+            } else if (physicalOption) {
+                if(totalAmount<=0) {
+                    alert("구매 수량이 0보다 작을 수 없습니다.");
+                    return;
+                }
+                purchaseType="physical";
+            }else if (ebookOption) {
+                purchaseType="ebook";
+                totalAmount=1;
+            }
+            else{
+                alert("구매 방법을 선택해주세요");
+                return;
+            }
+
+            confirm("구매 하시겠습니까??")
+            {
+                console.log("bookId: " + bookId, "memberId : "+memberId, "partnerOrderId : "+partnerOrderId, "bookName : "+bookName, "purchaseType : "+purchaseType);
+                console.log("totalPrice: " + totalPrice.value, "totalAmount" + totalAmount.value);
+                form.submit();
+            }
+
+        }
+    </script>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+                            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+                            crossorigin="anonymous">
+
+</script>
+</body>
+</html>
