@@ -22,7 +22,7 @@ public class WebSecurityConfig {
      */
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("css/**", "js/**",  "scss/**", "images/**", "fonts/**", "json/**", "assets/**", "svg/**"); // 이 경로로 시작하는 것들은 보안 검사를 하지 말라는 의미
+        return (web) -> web.ignoring().requestMatchers("css/**", "js/**",  "scss/**", "bookImage/**", "fonts/**", "json/**", "assets/**", "svg/**"); // 이 경로로 시작하는 것들은 보안 검사를 하지 말라는 의미
     }
 
     @Bean
@@ -38,21 +38,21 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests((registry) -> {
                     registry
 
-                    // 누구나 허용
-                    .requestMatchers("/", "/index.html","/auth/login","/member/signup").permitAll()
+                            // 누구나 허용
+                            .requestMatchers("/", "/index.html","/auth/login","/member/signup").permitAll()
 
-                    // 로그인 안 한 사용자에게 허용되는 페이지
-                    .requestMatchers("/member/**", "/auth/login","/bookboard/","/noticeboard/").anonymous()
+                            // 로그인 안 한 사용자에게 허용되는 페이지
+                            .requestMatchers( "/auth/login","/bookboard/","/noticeboard/").anonymous()
 
-                    // 인증된 사용자만 허용 - 로그인 한 사용자를 의미함
-                    .requestMatchers("/noticeboard/**","/bookboard/**").authenticated()
+                            // 인증된 사용자만 허용 - 로그인 한 사용자를 의미함
+                            .requestMatchers("/noticeboard/**","/bookboard/**").authenticated()
 
-                    // ROLE_ADMIN 권한이 있는 사용자만 허용
-                    .requestMatchers("/admin/**","/noticeboard/**","/bookboard/**","/noticeboard/**").hasRole("ADMIN")
+                            // ROLE_ADMIN 권한이 있는 사용자만 허용
+                            .requestMatchers("/admin/**","/noticeboard/**","/bookboard/**","/noticeboard/**").hasRole("ADMIN")
 
-                    // 나머지들은 이렇게 해주세요~
-                    .anyRequest().authenticated();
-        }); // 람다로 작성하게 되어있음
+                            // 나머지들은 이렇게 해주세요~
+                            .anyRequest().authenticated();
+                }); // 람다로 작성하게 되어있음
 
         /**
          * 폼 로그인 설정
@@ -63,7 +63,7 @@ public class WebSecurityConfig {
                     .loginPage("/auth/login") // GET 방식의 로그인 폼 요청
                     .loginProcessingUrl("/auth/login") // html에서 로그인 POST요청을 하면 이 기능이 실행된다
                     .successHandler(customAuthenticationSuccessHandler()) // 사용자 정의 인증 성공 핸들러 설정
-//                    .defaultSuccessUrl("/", true) // 로그인 성공 후 이동 페이지 customAuthenticationSuccessHandler 여기서 해주고 있음
+                    .defaultSuccessUrl("/", true) // 로그인 성공 후 이동 페이지 customAuthenticationSuccessHandler 여기서 해주고 있음
                     .usernameParameter("username") // login.html의 input태그의 name 속성을 입력합니다.
                     .passwordParameter("password") // login.html의 input태그의 name 속성을 입력합니다.
                     .permitAll(); //로그인 페이지는 인증 없이 접근 가능

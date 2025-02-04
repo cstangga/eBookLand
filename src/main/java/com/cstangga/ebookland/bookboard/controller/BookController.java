@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -152,5 +153,12 @@ public class BookController {
     @GetMapping("/purchase")
     private void purchase(){
         log.info("GET /bookboard/purchase");
+    }
+
+    @GetMapping("/mybook")
+    public void myBook(@AuthenticationPrincipal AuthPrincipal authPrincipal, Model model) {
+        log.info("GET /member/myBook");
+        log.info("principal = {}", authPrincipal.getUsername());
+
     }
 }

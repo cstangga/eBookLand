@@ -28,17 +28,4 @@ public class SignupDto {
     private String extraAddress;
     private LocalDate birth;
 
-    private SignupDto entityToSignUpDto(Member entity) {
-        return SignupDto.builder()
-                .email(entity.getEmail())
-                .password(entity.getPassword())
-                .name(entity.getName())
-                .phoneNumber(entity.getPhoneNumber())
-                .postCode(entity.getPostCode())
-                .address(entity.getAddress())
-                .detailAddress(entity.getDetailAddress())
-                .extraAddress(entity.getExtraAddress())
-                .birth(entity.getBirth())
-                .gender(entity.getGender()).build();
-    }
 }

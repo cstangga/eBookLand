@@ -1,13 +1,21 @@
 package com.cstangga.ebookland.member.controller;
 
+import com.cstangga.ebookland.auth.principal.AuthPrincipal;
+import com.cstangga.ebookland.member.dto.MemberDto;
 import com.cstangga.ebookland.member.dto.SignupDto;
 import com.cstangga.ebookland.member.entity.Member;
 import com.cstangga.ebookland.member.service.MemberService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @Slf4j
 @Controller
@@ -31,24 +39,57 @@ public class MemberController {
         return memberService.sameEmailCheck(email);
     }
 
-    @PostMapping("/resigstmember")
-    private String registMember(@ModelAttribute SignupDto dto)
+    @PostMapping("/registermember")
+    private String registermember(@ModelAttribute SignupDto dto)
     {
-        log.info("POST /member/resigstMember");
-
-        try {
-            String encodedPassword = passwordEncoder.encode(dto.getPassword());
-            log.info("password : {}", encodedPassword);
-            dto.setPassword(encodedPassword); // 암호와
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        System.out.println("dto = " + dto);
-
+        log.info("POST /member/registerMember");
         Member member=memberService.memberSave(dto);
         log.debug("member = {}", member);
         return "redirect:/";
     }
+
+
+    @GetMapping("/mypage")
+    public void mypage(@AuthenticationPrincipal AuthPrincipal authPrincipal, Model model) {
+        log.info("GET /member/myPage");
+        log.info("principal = {}", authPrincipal.getUsername());
+        MemberDto dto=memberService.findMemberByEmail(authPrincipal.getUsername());
+        log.info("dto = {}", dto);
+        model.addAttribute("memberDto",dto);
+
+    }
+
+    @PostMapping("/update")
+    public String update(@ModelAttribute MemberDto dto,Model model)
+    {
+        log.info("POST /member/update");
+        log.info("dto = {}", dto);
+        dto=memberService.memberUpdate(dto);
+        model.addAttribute("memberDto", dto);
+        return "redirect:/member/mypage";
+    }
+
+    @PostMapping("/updatePassword")
+    @ResponseBody
+    public String  updatePassword(@RequestParam("newPassword") String password,@RequestParam("memberId")String memberId)
+    {
+        log.info("POST /member/updatePassword");
+        log.info("password = {}", password);
+        log.info("memberId = {}", memberId);
+        memberService.updatePassword(memberId,password);
+        return "success";
+    }
+
+    @PostMapping("/passwordCheck")
+    @ResponseBody
+    public boolean passwordCheck(@RequestParam("password") String password,@RequestParam("memberId")String memberId)
+    {
+        log.info("GET /member/passwordCheck");
+        log.info("password : {}", password);
+        log.info("memberId : {}", memberId);
+        return memberService.checkPassword(memberId,password);
+    }
+
+
 
 }

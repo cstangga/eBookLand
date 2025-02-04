@@ -14,9 +14,8 @@
 <body>
 <main class="container" layout:fragment="main">
     <div>
-        <form th:action="@{/member/resigstmember}" id="signup-form"
+        <form th:action="@{/member/registermember}" id="signup-form"
               method="post" onsubmit="return isValid()">
-            <!-- enctype 속성이 multipart/form-data로 설정되어 있어야 서버가 요청을 multipart로 처리할 수 있음 -->
 
             <!-- 회원가입 폼 -->
             <div class="form-row">
@@ -78,7 +77,7 @@
 
             <div class="form-row" style="margin-bottom: 10px">
                 <div class="form-group col-md-12" style="margin-bottom: 5px">
-                    <label for="gender">주소 *</label>
+                    <label for="sample6_address">주소 *</label>
                     <div style="display: flex; margin-bottom: 5px">
                         <input type="text" class="form-control" id="sample6_postcode"
                                name = "postCode" placeholder="우편번호">

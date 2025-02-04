@@ -37,7 +37,7 @@ public class BookModifyDto {
                 .publisherName(book.getPublisherName())
                 .bookAmount(book.getAmount())
                 .bookGenre(book.getBookGenres())
-                .rentalPrice(book.getAmount())
+                .rentalPrice(book.getRentalPrice())
                 .purchasePrice(book.getPurchasePrice())
                 .bookSummary(book.getBookSummary())
                 .bookDetails(book.getBookDetails())

@@ -1,14 +1,176 @@
 <!doctype html>
-<html lang="en">
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>회원 관리</title>
+    <style>
+        .nav-tabs {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: center;
+            border-bottom: none;
+        }
+        .nav-link {
+            white-space: nowrap;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 5px;
+        }
+        .nav-link.active {
+            background-color: #007bff;
+            color: white;
+        }
+        .my-nav {
+            margin-bottom: 60px;
+        }
+        .my-section-title {
+            margin-top: 60px;
+        }
+    </style>
 </head>
 <body>
-<h1>마이페이지</h1>
+<main layout:fragment="main" class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="wrapper">
+                <!-- 네비게이션 버튼 -->
+                <nav class="my-nav">
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <button class="nav-link active" onclick="showSection('profile', this)">프로필</button>
+                        <button class="nav-link" onclick="showSection('changePassword', this)">비밀번호 변경</button>
+                        <button class="nav-link" onclick="showSection('myBookList', this)">구매 목록</button>
+                    </div>
+                </nav>
 
+                <!-- 프로필 섹션 -->
+                <div id="profile">
+                    <h1>회원정보 수정</h1>
+                    <form th:action="@{/member/update}" method="post" id="updateForm">
+                        <input type="hidden" th:value="${memberDto.memberId}" name="memberId" id="memberId">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">이름</label>
+                            <input type="text" th:value="${memberDto.memberName}" class="form-control" id="name" name="memberName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">핸드폰 번호</label>
+                            <input type="tel" th:value="${memberDto.memberPhone}" class="form-control" id="phone" name="memberPhone" required>
+                        </div>
+                        <div class="form-row" style="margin-bottom: 10px">
+                            <div class="form-group col-md-12" style="margin-bottom: 5px">
+                                <label for="sample6_address">주소 *</label>
+                                <div style="display: flex; margin-bottom: 5px">
+                                    <input type="text" th:value="${memberDto.postCode}" class="form-control" id="sample6_postcode" name="postCode" placeholder="우편번호">
+                                    <input type="button" class="form-control" onclick="sample6_execDaumPostcode()" value="우편번호 찾기">
+                                </div>
+                                <input type="text" th:value="${memberDto.address}" class="form-control col-md-12" name="address" id="sample6_address" placeholder="주소">
+                            </div>
+                            <div style="display: flex" class="col-md-12">
+                                <input type="text" th:value="${memberDto.detailAddress}" class="form-control" name="detailAddress" id="sample6_detailAddress" placeholder="상세주소">
+                                <input type="text" th:value="${memberDto.extraAddress}" class="form-control" name="extraAddress" id="sample6_extraAddress" placeholder="참고항목">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">수정</button>
+                    </form>
+                </div>
+
+                <!-- 구매 목록 섹션 -->
+                <div id="myBookList" style="display: none;">
+                    <h1>구매 목록페이지 입니다.</h1>
+                </div>
+
+                <!-- 비밀번호 변경 섹션 -->
+                <div id="changePassword" style="display: none;">
+                    <h1>비밀번호 변경</h1>
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">현재 비밀번호</label>
+                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                        <button type="button" class="btn btn-secondary mt-2" onclick="checkPassword()">비밀번호 체크</button>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">새로운 비밀번호</label>
+                        <input type="password" class="form-control" id="newPassword" name="newPassword" disabled required>
+                        <button type="button" class="btn btn-secondary mt-2" id="updatePasswordBtn" onclick="updatePassword()" disabled>비밀번호 변경</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 초기 로딩 시 프로필 섹션만 보이게 설정
+        document.addEventListener("DOMContentLoaded", function () {
+            showSection('profile', document.querySelector('.nav-link.active'));
+        });
+
+        function showSection(sectionId, clickedButton) {
+            // 모든 섹션 숨기기
+            document.getElementById('profile').style.display = 'none';
+            document.getElementById('changePassword').style.display = 'none';
+            document.getElementById('myBookList').style.display = 'none';
+
+            // 선택된 섹션 보이기
+            document.getElementById(sectionId).style.display = 'block';
+
+            // 모든 탭에서 active 클래스 제거 후, 클릭한 버튼에 추가
+            document.querySelectorAll(".nav-link").forEach(tab => tab.classList.remove("active"));
+            clickedButton.classList.add("active");
+
+            // 선택된 섹션으로 스크롤 이동
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function checkPassword() {
+            let currentPassword = document.getElementById('currentPassword').value;
+            const memberId = document.getElementById('memberId').value;
+
+            if (!currentPassword) {
+                alert('현재 비밀번호를 입력해 주세요.');
+                return;
+            }
+
+            $.ajax({
+                url: '/member/passwordCheck',
+                method: 'post',
+                processData: true,
+                data: {
+                    password: currentPassword,
+                    memberId: memberId
+                },
+                success(responseText) {
+                    if (responseText) {
+                        alert('비밀번호가 확인됐습니다.');
+                        document.getElementById('newPassword').disabled = false;
+                        document.getElementById('updatePasswordBtn').disabled = false;
+                    } else {
+                        alert('비밀번호가 틀립니다.');
+                        document.getElementById('currentPassword').value = '';
+                    }
+                }
+            });
+        }
+
+        function updatePassword() {
+            const memberId = document.getElementById('memberId').value;
+            const newPassword = document.getElementById('newPassword').value;
+
+            $.ajax({
+                url: '/member/updatePassword',
+                method: 'post',
+                processData: true,
+                data: {
+                    newPassword: newPassword,
+                    memberId: memberId
+                },
+                success() {
+                    alert('비밀번호 변경이 완료됐습니다.');
+                    window.location.reload();
+                }
+            });
+        }
+    </script>
+</main>
+<script layout:fragment="js" th:src="@{/js/member/signup.js}"></script>
 </body>
 </html>

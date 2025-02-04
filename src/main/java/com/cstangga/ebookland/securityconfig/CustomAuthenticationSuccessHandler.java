@@ -37,7 +37,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         // Admin이 있는 경우만 확인하면 되기 대문에 ADMIN만 확인합니다.
         for (GrantedAuthority authority : authorities) {
             if (authority.getAuthority().equals("ROLE_ADMIN")) {
-                redirectUrl = "/board/adminboard"; // 관리자 페이지 URL 설정합니다.
+                redirectUrl = "/admin/adminboard"; // 관리자 페이지 URL 설정합니다.
                 break; // 추가 권한 확인 필요 없으므로 반복 중단합니다.
             }
         }

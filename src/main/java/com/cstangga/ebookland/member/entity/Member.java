@@ -24,7 +24,8 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Member {
+public class
+Member {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
     private long id;
