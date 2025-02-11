@@ -1,14 +1,15 @@
 package com.cstangga.ebookland.bookboard.controller;
 
 import com.cstangga.ebookland.auth.principal.AuthPrincipal;
-import com.cstangga.ebookland.bookboard.dto.BookListDto;
-import com.cstangga.ebookland.bookboard.dto.BookModifyDto;
-import com.cstangga.ebookland.bookboard.dto.BookPurchaseRequestDto;
-import com.cstangga.ebookland.bookboard.dto.BookRegistDto;
+import com.cstangga.ebookland.bookboard.dto.*;
 import com.cstangga.ebookland.bookboard.entity.Book;
+import com.cstangga.ebookland.bookboard.entity.BuyEbook;
+import com.cstangga.ebookland.bookboard.entity.BuyPaperBook;
+import com.cstangga.ebookland.bookboard.entity.RentalEbook;
+import com.cstangga.ebookland.bookboard.repository.BookRepository;
+import com.cstangga.ebookland.bookboard.repository.RentalBookRepository;
 import com.cstangga.ebookland.bookboard.service.BookService;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookController {
     private final BookService bookService;
+    private final RentalBookRepository rentalBookRepository;
 
     @GetMapping("/list")
     public void list(Model model) {
@@ -50,20 +52,20 @@ public class BookController {
         log.info("dto = {}",dto);
         log.info("bookImage = {}",bookImage.getName());
 
-        dto.setImagePath(bookService.saveImage(bookImage));
+        dto.setImageName(bookService.saveImage(bookImage));
         Book entity=dto.dtoToEntity();
         bookService.save(entity);
 
     }
 
-    @GetMapping("/modifybook/{bookId}") // 책 정보를 바꿀때 detail
+    @GetMapping("/modifybook/{bookId}") // 책 정보를 바꿀때
     public String modifybook(@PathVariable("bookId") long bookId, Model model)
     {
         log.info("GET /bookboard/modifybook/{}",bookId);
         BookModifyDto bookDto=new BookModifyDto().entityToDto(bookService.findByBookId(bookId));
         log.info("bookDto = {}",bookDto);
         model.addAttribute("bookDto",bookDto);
-        return "bookboard/modifybook";
+        return "/bookboard/modifybook";
     }
 
     @GetMapping("/detail/{bookId}") // 사용자가 보는 detail
@@ -73,7 +75,7 @@ public class BookController {
         BookModifyDto bookDto=new BookModifyDto().entityToDto(bookService.findByBookId(bookId));
         log.info("bookDto = {}",bookDto);
         model.addAttribute("bookDto",bookDto);
-        return "bookboard/detail";
+        return "/bookboard/detail";
     }
 
     @PostMapping("/update") // 도서 상태 업데이트
@@ -83,10 +85,10 @@ public class BookController {
         log.info("dto = {}",dto);
         log.info("bookImage = {}",bookImage.getOriginalFilename());
         if(!bookImage.isEmpty())
-            dto.setImagePath(bookService.saveImage(bookImage));
+            dto.setImageName(bookService.saveImage(bookImage));
         bookService.update(dto);
         model.addAttribute("bookDto",dto);
-        return "book/detail";
+        return String.format("redirect:/bookboard/detail/%d",dto.getBookId());
     }
     @PostMapping("/removeBook")
     public String removeBook(@RequestParam("bookId")String bookId)
@@ -94,7 +96,7 @@ public class BookController {
         log.info("POST /bookboard/removeBook");
         bookService.removeBookImage(Long.parseLong(bookId));
         bookService.removeBook(bookId);
-        return "book/modifybook";
+        return "/bookboard/list";
     }
 
     @ResponseBody
@@ -132,12 +134,32 @@ public class BookController {
         return "/";
     }
 
-    @PostMapping("/purchase")
-    public String purchase( BookPurchaseRequestDto dto, Model model)
+    @PostMapping("/buyBook")
+    public String buyBook(@ModelAttribute BuyBookDto dto)
     {
-        log.info("POST /bookboard/purchase");
+        log.info("POST /bookboard/buyBook");
         log.info("dto = {}",dto);
-        return "/index";
+        if(dto.getBuyOption().equals("eBook"))
+        {
+            BuyEbook buyEbookEntity=bookService.buyEbook(dto);
+            log.info("buyEbookEntity = {}",buyEbookEntity);
+        }
+        else{
+            BuyPaperBook buyPaperBook=bookService.buyPaperBook(dto);
+            log.info("buyPaperBook = {}",buyPaperBook);
+        }
+
+        return String.format("redirect:/bookboard/detail/%d",dto.getBookId());
+    }
+
+    @PostMapping("/rentalEbook")
+    @ResponseBody
+    public String rentalEbook(@ModelAttribute RentalBookDto dto)
+    {
+        log.info("POST /bookboard/rentalEbook");
+        log.info("dto = {}",dto);
+        bookService.rentalBook(dto);
+        return "success";
     }
 
     @GetMapping("/modifybook")
@@ -157,7 +179,7 @@ public class BookController {
 
     @GetMapping("/mybook")
     public void myBook(@AuthenticationPrincipal AuthPrincipal authPrincipal, Model model) {
-        log.info("GET /member/myBook");
+        log.info("GET /bookboard/myBook");
         log.info("principal = {}", authPrincipal.getUsername());
 
     }

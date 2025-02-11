@@ -16,7 +16,7 @@ public class BookListDto {
     private String bookName;
     private String author;
     private String publisher;
-    private String imagePath;
+    private String imageName;
 
     public BookListDto entityToDto(Book entity) {
         return BookListDto.builder()
@@ -24,7 +24,7 @@ public class BookListDto {
                 .bookName(entity.getBookName())
                 .author(entity.getAuthorName())
                 .publisher(entity.getPublisherName())
-                .imagePath(entity.getImagePath())
+                .imageName(entity.getImageName())
                 .build();
     }
 }

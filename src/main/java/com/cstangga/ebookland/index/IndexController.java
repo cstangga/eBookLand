@@ -20,7 +20,7 @@ public class IndexController {
     private final BookService bookService;
 
     @GetMapping("/")
-    public String index(@ModelAttribute BookListDto bookListDto, Model model) {
+    public String index( Model model) {
         List<BookListDto> bookDtoList=new ArrayList<>();
         List<Book> booksEntity = bookService.findAll();
         for(Book book:booksEntity)

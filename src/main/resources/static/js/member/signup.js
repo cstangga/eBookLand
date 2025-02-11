@@ -23,7 +23,7 @@ function duplicateEmailCheck() {
         alert('이메일을 입력해주세요.');
         return false;
     }
-
+    console.log('email : ',memberEmail.value)
     $.ajax(
         {
         url: '/member/sameEmailCheck', // 대괄호를 꼭 써줘야 한다, 그렇지 않으면 controller로 넘어가지 않는다.
@@ -45,7 +45,7 @@ function duplicateEmailCheck() {
             console.log('이메일 중복 체크 오류입니다.');
         },
         complete: function () {
-            console.log('이메일 중복 체크 완료')
+            console.log('이메일 중복 체크 완료fyfyfyfyfy')
         }
     });
     return emailCheckResult;

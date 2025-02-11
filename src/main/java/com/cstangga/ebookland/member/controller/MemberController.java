@@ -34,7 +34,7 @@ public class MemberController {
     @ResponseBody
     public boolean sameEmailCheck(@RequestParam("email") String email)
     {
-        log.info("GET /member/sameEmailCheck");
+        log.info("POST /member/sameEmailCheck");
         log.info("이메일 : {}", email);
         return memberService.sameEmailCheck(email);
     }
@@ -56,6 +56,8 @@ public class MemberController {
         MemberDto dto=memberService.findMemberByEmail(authPrincipal.getUsername());
         log.info("dto = {}", dto);
         model.addAttribute("memberDto",dto);
+
+        // 대여, 구매(Ebook, offline) 목록 나와야 함
 
     }
 

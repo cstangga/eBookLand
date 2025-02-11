@@ -1,4 +1,5 @@
 <!doctype html><html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+                     xmlns:th="http://www.thymeleaf.org"
                      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
                      layout:decorate="~{layout/default}"><head>
     <meta charset="UTF-8">
@@ -8,6 +9,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5PlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
+        #buyBtn, #rentalBtn {
+            display: none;
+        }
         .row {
             display: flex;
             align-items: stretch; /* Make all columns equal in height */
@@ -42,7 +46,8 @@
         <div class="row" style="align-items: flex-start;">
             <!-- Left Column: Book Image -->
             <div class="col-md-4 form-section text-center">
-                <img id="previewImage" name="imagePath" th:src="@{${bookDto.imagePath}}" alt="Book Cover"
+                <img id="noImage" name="imageName" th:if="${#strings.isEmpty(bookDto.imageName)}" th:src="@{/bookImage/noImage.PNG}" alt="Book Cover">
+                <img id="previewImage" name="imageName" th:unless="${#strings.isEmpty(bookDto.imageName)}"  th:src="@{/bookImage/{bookImage}(bookImage=${bookDto.imageName})}"  alt="Book Cover"
                      class="image-section">
             </div>
 
@@ -64,12 +69,18 @@
                 <p>
                     <span th:if="${bookDto.bookGenre.contains(T(com.cstangga.ebookland.bookboard.entity.BookGenre).FANTASY)}">판타지</span>
                     <span th:if="${bookDto.bookGenre.contains(T(com.cstangga.ebookland.bookboard.entity.BookGenre).HORROR)}">호러</span>
+                    <span th:if="${bookDto.bookGenre.contains(T(com.cstangga.ebookland.bookboard.entity.BookGenre).ACTION)}">액션</span>
+                    <span th:if="${bookDto.bookGenre.contains(T(com.cstangga.ebookland.bookboard.entity.BookGenre).DRAMA)}">드라마</span>
+                    <span th:if="${bookDto.bookGenre.contains(T(com.cstangga.ebookland.bookboard.entity.BookGenre).COMIC)}">코믹</span>
+                    <span th:if="${bookDto.bookGenre.contains(T(com.cstangga.ebookland.bookboard.entity.BookGenre).MYSTERY)}">추리</span>
+                    <span th:if="${bookDto.bookGenre.contains(T(com.cstangga.ebookland.bookboard.entity.BookGenre).ROMANCE)}">로맨스</span>
                 </p>
 
                 <h5>판매 상태</h5>
                 <p>
-                    <span th:if="${bookDto.bookTransactionType.contains(T(com.cstangga.ebookland.bookboard.entity.BookTransactionType).RENTAL)}">대여</span>
-                    <span th:if="${bookDto.bookTransactionType.contains(T(com.cstangga.ebookland.bookboard.entity.BookTransactionType).ONLINE_PURCHASE)}">전자 구매</span>
+                    <span th:if="${bookDto.sellsOptions.contains(T(com.cstangga.ebookland.bookboard.entity.SellsOptions).RENTAL_EBOOK)}">대여</span>
+                    <span th:if="${bookDto.sellsOptions.contains(T(com.cstangga.ebookland.bookboard.entity.SellsOptions).EBOOK)}">전자 구매</span>
+                    <span th:if="${bookDto.sellsOptions.contains(T(com.cstangga.ebookland.bookboard.entity.SellsOptions).PAPER_BOOK)}">실물 구매</span>
                 </p>
 
                 <h5>가격</h5>
@@ -92,19 +103,19 @@
                     <h5>구매 방식 선택</h5>
                     <div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="purchaseType" id="rentalOption" value="rental"
-                                   onclick="toggleInput('rental')">
-                            <label class="form-check-label" for="rentalOption">대여</label>
+                            <input class="form-check-input" type="radio" name="buyType" id="rentalEbookToggle" value="rentalEbook"
+                                   onclick="toggleInput('rentalEbookToggle')">
+                            <label class="form-check-label" for="rentalEbookToggle">전자책 대여</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="purchaseType" id="ebookOption" value="online"
-                                   onclick="toggleInput('ebook')">
-                            <label class="form-check-label" for="ebookOption">전자 구매</label>
+                            <input class="form-check-input" type="radio" name="buyType" id="ebookToggle" value="ebook"
+                                   onclick="toggleInput('ebookToggle')">
+                            <label class="form-check-label" for="ebookToggle">전자책 구매</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="purchaseType" id="physicalOption" value="offline"
-                                   onclick="toggleInput('physical')">
-                            <label class="form-check-label" for="physicalOption">실물 구매</label>
+                            <input class="form-check-input" type="radio" name="buyType" id="paperBookToggle" value="paperBook"
+                                   onclick="toggleInput('paperBookToggle')">
+                            <label class="form-check-label" for="paperBookToggle">종이책 구매</label>
                         </div>
                     </div>
 
@@ -122,7 +133,12 @@
 
             <div class="text-center mt-4">
 
-                <button type="button" class="btn btn-primary" onclick="checkInfo()">구매</button>
+                <button type="button" id="buyBtn" class="btn btn-primary" onclick="checkAndBuyBook()">구매하기</button>
+                <button type="button" id="rentalBtn" class="btn btn-primary" onclick="checkAndRental()">대여하기</button>
+                <a sec:authorize="hasRole('ADMIN')" class="btn btn-primary"
+                   th:href="@{|/bookboard/modifybook/${bookDto.bookId}|}">
+                    수정
+                </a>
                 <input type="hidden" th:value="${bookDto.bookId}" name="bookId" id="bookId">
                 <input type="hidden" th:value="${#authentication.principal.member.id}" name="memberId" id="memberId">
             </div>
@@ -130,31 +146,39 @@
     </form>
 
     <script th:inline="javascript">
-        function toggleInput(option) {
+        function toggleInput(toggle) {
             const inputField = document.getElementById('inputField');
             const dynamicInput = document.getElementById('dynamicInput');
             const dynamicLabel = document.getElementById('dynamicLabel');
-            inputField.value = ""; // Reset value
-            dynamicInput.style.display = 'block';
+            const rentalBtn = document.getElementById('rentalBtn');
+            const buyBtn = document.getElementById('buyBtn');
 
-            if (option === 'rental') {
+            inputField.value = "";
+            dynamicInput.style.display = 'block';  // 입력 필드 기본적으로 보이게 설정
+            rentalBtn.style.display = 'none'; // 버튼 초기 숨김
+            buyBtn.style.display = 'none';   // 버튼 초기 숨김
+
+            if (toggle === 'rentalEbookToggle') {
                 dynamicLabel.innerText = '대여 기간 (일)';
                 inputField.placeholder = '대여 기간을 입력하세요';
-            } else if (option === 'physical') {
+                rentalBtn.style.display = 'inline-block'; // "대여하기" 버튼 표시
+            } else if (toggle === 'paperBookToggle') {
                 dynamicLabel.innerText = '구매 권 수';
                 inputField.placeholder = '구매할 권 수를 입력하세요';
+                buyBtn.style.display = 'inline-block'; // "구매하기" 버튼 표시
             } else {
-                dynamicInput.style.display = 'none';
+                dynamicInput.style.display = 'none'; // 입력 필드 숨김
+                buyBtn.style.display = 'inline-block'; // "구매하기" 버튼 표시 (전자책 구매)
             }
 
-            calculateTotal();
+            calculateTotal(); // 총 가격 계산
         }
 
         function calculateTotal() {
             const inputField = document.getElementById('inputField');
             const totalPrice = document.getElementById('totalPrice');
-            const rentalOption = document.getElementById('rentalOption').checked;
-            const physicalOption = document.getElementById('physicalOption').checked;
+            const rental_toggle = document.getElementById('rentalEbookToggle').checked;
+            const paperBook_toggle = document.getElementById('paperBookToggle').checked;
 
 
             const rentalPrice = parseInt(/*[[${bookDto.rentalPrice}]]*/);
@@ -165,9 +189,9 @@
 
             const inputValue = parseInt(inputField.value || 0);
 
-            if (rentalOption) {
+            if (rental_toggle) {
                 totalPrice.innerText = (rentalPrice * inputValue).toLocaleString();
-            } else if (physicalOption) {
+            } else if (paperBook_toggle) {
                 totalPrice.innerText = (purchasePrice * inputValue).toLocaleString();
             } else {
                 totalPrice.innerText = purchasePrice.toLocaleString();
@@ -175,34 +199,25 @@
         }
     </script>
     <script th:inline="javascript">
-        function checkInfo() {
-            const form = document.getElementById('purchaseForm');
+        function checkAndBuyBook() {
             const bookId = document.getElementById('bookId').value; //
             const memberId = document.getElementById('memberId').value;
-            const partnerOrderId = crypto.randomUUID();
             let totalPrice = document.getElementById('totalPrice'); // 전체 가격
             let inputField= document.getElementById('inputField'); // 몇 권인지
-            const rentalOption = document.getElementById('rentalOption').checked;
-            const physicalOption = document.getElementById('physicalOption').checked;
-            const ebookOption = document.getElementById('ebookOption').checked;
+            const paperBook_toggle = document.getElementById('paperBookToggle').checked;
+            const ebook_toggle = document.getElementById('ebookToggle').checked;
             const bookName = [[${bookDto.bookName}]];
-            let purchaseType;
+            let buyOption;
 
             let totalAmount=parseInt(inputField.value || 0);
-            if (rentalOption) {
-                if(totalAmount<=0) {
-                    alert("대여 기간은 최소 1일입니다");
-                    return;
-                }
-                purchaseType="rental";
-            } else if (physicalOption) {
+            if (paperBook_toggle) {
                 if(totalAmount<=0) {
                     alert("구매 수량이 0보다 작을 수 없습니다.");
                     return;
                 }
-                purchaseType="physical";
-            }else if (ebookOption) {
-                purchaseType="ebook";
+                buyOption="paperBook";
+            }else if (ebook_toggle) {
+                buyOption="ebook";
                 totalAmount=1;
             }
             else{
@@ -212,11 +227,79 @@
 
             confirm("구매 하시겠습니까??")
             {
-                console.log("bookId: " + bookId, "memberId : "+memberId, "partnerOrderId : "+partnerOrderId, "bookName : "+bookName, "purchaseType : "+purchaseType);
+                console.log("bookId: " + bookId, "memberId : "+memberId, "bookName : "+bookName, "buyOption : "+buyOption);
                 console.log("totalPrice: " + totalPrice.value, "totalAmount" + totalAmount.value);
-                form.submit();
+                $.ajax({
+
+                    url: '/bookboard/buyEbook',
+                    method: 'post',
+                    processData: true, // false = formData를 string으로 변환하지 않음
+                    data:{
+                        bookId:bookId,
+                        buyOption : buyOption,
+                        memberId : memberId,
+                        totalAmount:totalAmount,
+                        totalPrice: totalPrice.value,
+                    },
+
+                    success(responseText) {
+                        alert("전자책 구매가 완료됐습니다.")
+                    }
+                })
             }
 
+        }
+    </script>
+
+    <script th:inline="javascript">
+        function checkAndRental() {
+            const bookId = document.getElementById('bookId').value;
+            const memberId = document.getElementById('memberId').value;
+            const inputField = document.getElementById('inputField');
+            const rental_toggle = document.getElementById('rentalEbookToggle').checked;
+            const bookName = [[${bookDto.bookName}]];
+
+            let rentalDays = parseInt(inputField.value || 0);
+            if (!rental_toggle) {
+                alert("대여 옵션을 선택해주세요.");
+                return;
+            }
+
+            if (rentalDays <= 0) {
+                alert("대여 기간은 최소 1일 이상이어야 합니다.");
+                return;
+            }
+
+            // 🔹 최신 총 가격 계산
+            calculateTotal();
+
+            // 🔹 쉼표 제거 후 숫자로 변환
+            let totalPrice = document.getElementById('totalPrice').innerText;
+            let totalPriceValue = parseInt(totalPrice.replace(/,/g, '')) || 0;
+
+            console.log("bookIdddd: " + bookId, "memberId: " + memberId, "rentalDays: " + rentalDays);
+            console.log("totalPrice: " + totalPriceValue);
+
+            if (confirm("전자책을 대여하시겠습니까?")) {
+                $.ajax({
+                    url: '/bookboard/rentalEbook',
+                    method: 'POST',
+                    data:{
+                        bookId: bookId,
+                        rentalDays: rentalDays,
+                        memberId: memberId,
+                        totalPrice: totalPriceValue
+                    },
+                    success: function(response) {
+                        alert("대여가 완료되었습니다.");
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX 요청 실패:", error);
+                        alert("대여 요청 중 오류가 발생했습니다. 다시 시도해주세요.");
+                    }
+                });
+            }
         }
     </script>
 </main>

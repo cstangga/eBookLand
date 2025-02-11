@@ -85,7 +85,8 @@
                 <a th:href="@{|/bookboard/detail/${bookDto.bookId}|}" class="item-link">
                     <div class="search-item-content">
                         <!-- Book Image -->
-                        <img th:src="@{${bookDto.imagePath}}" alt="Book Cover" class="book-image">
+                        <img th:if="${#strings.isEmpty(bookDto.imageName)}" th:src="@{/bookImage/noImage.PNG}" alt="Book Cover" class="book-image">
+                        <img th:unless="${#strings.isEmpty(bookDto.imageName)}" th:src="@{/bookImage/{bookImage}(bookImage=${bookDto.imageName})}" alt="Book Cover" class="book-image">
                         <!-- Book Details -->
                         <div class="book-details">
                             <h5 th:text="${bookDto.bookName}">제목</h5>

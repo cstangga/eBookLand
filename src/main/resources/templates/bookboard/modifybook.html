@@ -23,7 +23,10 @@
                         <label for="bookImage">책 표지</label>
                         <input type="file" name="bookImage" id="bookImage" accept="image/*" class="form-control" onchange="showPreview(event)">
                         <div class="mt-3">
-                            <img id="previewImage" name="imagePath" th:src="@{${bookDto.imagePath}}" alt="Book Cover Preview" style=" max-width: 60%; height: auto; border: 1px solid #ddd; padding: 10px;"
+                            <img id="noImage" name="imageName" th:if="${#strings.isEmpty(bookDto.imageName)}" th:src="@{/bookImage/noImage.PNG}" alt="Book Cover Preview" style=" max-width: 60%; height: auto; border: 1px solid #ddd; padding: 10px;"
+                                >
+                            <img id="previewImage" name="imageName" th:unless="${#strings.isEmpty(bookDto.imageName)}"  th:src="@{/bookImage/{bookImage}(bookImage=${bookDto.imageName})}"
+                                 alt="Book Cover Preview" style=" max-width: 60%; height: auto; border: 1px solid #ddd; padding: 10px;"
                                  onclick="removeLicenseImages(this.src)" >
                         </div>
                     </div>
@@ -67,11 +70,12 @@
                 <!-- Genre -->
                 <div class="form-row">
                     <div class="form-group">
-                        <p>ONLINE_PURCHASE Checked: [[${bookDto.bookTransactionType}]]</p>
-                        <p>ONLINE_PURCHASE Checked: [[${bookDto.bookGenre}]]</p>
-                        <p>ONLINE_PURCHASE Checked:
-                            [[${bookDto.bookGenre.contains(T(com.cstangga.ebookland.bookboard.entity.BookGenre).FANTASY)}]]</p>
-                        <p>Image Path: [[${bookDto.imagePath}]]</p>
+                        <p>책 Id = [[${bookDto.bookId}]]</p>
+                        <p>장르:
+                            [[${bookDto.bookGenre}]]</p>
+                        <p>판매 방법:
+                            [[${bookDto.sellsOptions}]]</p>
+                        <p>Image Path: [[${bookDto.imageName}]]</p>
                         <h3>책 장르</h3>
                         <label for="fantasy">
                             <input type="checkbox" name="bookGenre" id="fantasy" value="FANTASY"
@@ -107,16 +111,16 @@
                     <div class="form-group">
                         <h3>책 판매상태</h3>
                         <label for="rental">
-                            <input type="checkbox" name="bookTransactionType" id="rental" value="RENTAL"
-                                   th:checked="${bookDto.bookTransactionType.contains(T(com.cstangga.ebookland.bookboard.entity.BookTransactionType).RENTAL)}">대여
+                            <input type="checkbox" name="sellsOptions" id="rental" value="RENTAL_EBOOK"
+                                   th:checked="${bookDto.sellsOptions.contains(T(com.cstangga.ebookland.bookboard.entity.SellsOptions).RENTAL_EBOOK)}">전자책 대여
                         </label>
                         <label for="offline_purchase">
-                            <input type="checkbox" name="bookTransactionType" id="offline_purchase" value="OFFLINE_PURCHASE"
-                                   th:checked="${bookDto.bookTransactionType.contains(T(com.cstangga.ebookland.bookboard.entity.BookTransactionType).OFFLINE_PURCHASE)}">오프라인
+                            <input type="checkbox" name="sellsOptions" id="offline_purchase" value="PAPER_BOOK"
+                                   th:checked="${bookDto.sellsOptions.contains(T(com.cstangga.ebookland.bookboard.entity.SellsOptions).PAPER_BOOK)}">종이책 구매
                         </label>
                         <label for="online_purchase">
-                            <input type="checkbox" name="bookTransactionType" id="online_purchase" value="ONLINE_PURCHASE"
-                                   th:checked="${bookDto.bookTransactionType.contains(T(com.cstangga.ebookland.bookboard.entity.BookTransactionType).ONLINE_PURCHASE)}">온라인
+                            <input type="checkbox" name="sellsOptions" id="online_purchase" value="EBOOK"
+                                   th:checked="${bookDto.sellsOptions.contains(T(com.cstangga.ebookland.bookboard.entity.SellsOptions).EBOOK)}">전자책 구매
                         </label>
                     </div>
                 </div>
@@ -136,7 +140,7 @@
                         <input class="form-control" id="purchasePrice" name="purchasePrice" placeholder="구매 가격"
                                required type="text" oninput="purchasePrice(this)"
                                th:value="${bookDto.purchasePrice}" onclick="removeImage(this)">
-                        <input type="hidden" name="imagePath" id="imagePathHidden" th:value="${bookDto.imagePath}">
+                        <input type="hidden" name="imageName" id="imageNameHidden" th:value="${bookDto.imageName}">
                     </div>
                 </div>
             </div>
@@ -203,7 +207,7 @@
 
                 $.ajax({
 
-                    url: '[[@{/book/removeBookImage}]]',
+                    url: '[[@{/bookboard/removeBookImage}]]',
                     method: 'post',
                     // contentType: false, // false = content-type 헤더가 multipart/form-data로 전송하게 함
                     processData: true, // false = formData를 string으로 변환하지 않음
@@ -225,7 +229,7 @@
 
                 $.ajax({
 
-                    url: '[[@{/book/removeBook}]]',
+                    url: '[[@{/bookboard/removeBook}]]',
                     method: 'post',
                     // contentType: false, // false = content-type 헤더가 multipart/form-data로 전송하게 함
                     processData: true, // false = formData를 string으로 변환하지 않음

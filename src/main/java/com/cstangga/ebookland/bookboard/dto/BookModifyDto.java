@@ -3,7 +3,7 @@ package com.cstangga.ebookland.bookboard.dto;
 
 import com.cstangga.ebookland.bookboard.entity.Book;
 import com.cstangga.ebookland.bookboard.entity.BookGenre;
-import com.cstangga.ebookland.bookboard.entity.BookTransactionType;
+import com.cstangga.ebookland.bookboard.entity.SellsOptions;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,8 +26,8 @@ public class BookModifyDto {
     private double purchasePrice;
     private String bookSummary;
     private String bookDetails;
-    private Set<BookTransactionType> bookTransactionType;
-    private String imagePath;
+    private Set<SellsOptions> sellsOptions;
+    private String imageName;
 
     public BookModifyDto entityToDto(Book book) {
         return BookModifyDto.builder()
@@ -41,8 +41,8 @@ public class BookModifyDto {
                 .purchasePrice(book.getPurchasePrice())
                 .bookSummary(book.getBookSummary())
                 .bookDetails(book.getBookDetails())
-                .bookTransactionType(book.getBookTransactionTypes())
-                .imagePath(book.getImagePath())
+                .sellsOptions(book.getSellsOptions())
+                .imageName(book.getImageName())
                 .build();
     }
 }

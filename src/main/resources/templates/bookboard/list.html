@@ -4,93 +4,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+          content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>도서 </title>
+    <title>도서 목록</title>
+    <style>
+        /* 📌 반응형 4행 × 5열 그리드 */
+        .search-results-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 기본 5열 */
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        /* 📌 모바일 최적화 (화면이 작아지면 자동 조정) */
+        @media (max-width: 1200px) {
+            .search-results-grid { grid-template-columns: repeat(4, 1fr); } /* 4열 */
+        }
+        @media (max-width: 992px) {
+            .search-results-grid { grid-template-columns: repeat(3, 1fr); } /* 3열 */
+        }
+        @media (max-width: 768px) {
+            .search-results-grid { grid-template-columns: repeat(2, 1fr); } /* 2열 */
+        }
+        @media (max-width: 480px) {
+            .search-results-grid { grid-template-columns: repeat(1, 1fr); } /* 1열 */
+        }
+
+        /* 개별 검색 결과 스타일 */
+        .search-item {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #f9f9f9;
+            transition: transform 0.2s ease-in-out;
+        }
+        .search-item:hover {
+            transform: scale(1.05);
+        }
+
+        /* 링크 스타일 */
+        .item-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            padding: 1rem;
+        }
+
+        /* 도서 표지 스타일 */
+        .book-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-bottom: 1px solid #ddd;
+            border-radius: 10px 10px 0 0;
+        }
+
+        /* 책 세부 정보 */
+        .book-details {
+            padding: 1rem;
+            text-align: center;
+        }
+        .book-details h5 {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .book-details p {
+            font-size: 1rem;
+            color: #555;
+        }
+
+        /* 검색 결과 스크롤 가능하게 */
+        .search-results-container {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+    </style>
 </head>
-<style>
-    /* Grid Layout for 5x4 */
-    .search-results-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1rem;
-        padding: 1rem;
-    }
-
-    /* Individual Search Item */
-    .search-item {
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        overflow: hidden;
-        background-color: #f9f9f9;
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* Link Styling */
-    .item-link {
-        text-decoration: none;
-        color: inherit;
-    }
-
-    /* Item Content */
-    .search-item-content {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        padding: 1rem;
-    }
-
-    /* Book Image */
-    .book-image {
-        max-width: 60%;
-        height: auto;
-        margin-right: 1rem;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-    }
-
-    /* Book Details */
-    .book-details {
-        flex: 1;
-    }
-
-    /* Scrollable Container */
-    .search-results-container {
-        max-height: 600px;
-        overflow-y: auto;
-    }
-</style>
 <body>
 <main class="container" layout:fragment="main">
     <div>
-        <!-- Search Form -->
+        <!-- 🔍 검색 폼 -->
         <form th:action="@{/bookboard/search}" method="post">
-            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" name="type">
+            <select class="form-select form-select-lg mb-3" aria-label="검색 유형" name="type">
                 <option value="author">저자</option>
                 <option value="bookName">책 이름</option>
             </select>
-            <label>
-                <input type="text" id="word" name="word" class="form-control">
-            </label>
+            <input type="text" id="word" name="word" class="form-control" placeholder="검색어 입력">
             <button type="submit" class="btn btn-primary mt-3">검색</button>
         </form>
     </div>
 
-    <!-- Search Results -->
+    <!-- 📚 검색 결과 -->
     <div class="search-results-container">
         <div class="search-results-grid" id="searchResults">
-            <div th:each="bookDto, stat : ${bookDtoList}" th:object="${bookDto}" class="search-item">
+            <div th:each="bookDto : ${bookDtoList}" th:object="${bookDto}" class="search-item">
                 <a th:href="@{|/bookboard/modifybook/${bookDto.bookId}|}" class="item-link">
-                    <div class="search-item-content">
-                        <!-- Book Image -->
-                        <img th:src="@{${bookDto.imagePath}}" alt="Book Cover" class="book-image">
-                        <!-- Book Details -->
-                        <div class="book-details">
-                            <h5 th:text="${bookDto.bookName}">제목</h5>
-                            <p>저자: <span th:text="${bookDto.author}"></span></p>
-                            <p>출판사: <span th:text="${bookDto.publisher}"></span></p>
-                        </div>
+                    <!-- 도서 표지 -->
+                    <img th:if="${#strings.isEmpty(bookDto.imageName)}"
+                         th:src="@{/bookImage/noImage.PNG}" alt="No Image" class="book-image">
+                    <img th:unless="${#strings.isEmpty(bookDto.imageName)}"
+                         th:src="@{/bookImage/{bookImage}(bookImage=${bookDto.imageName})}"
+                         alt="Book Cover" class="book-image">
+
+                    <!-- 도서 정보 -->
+                    <div class="book-details">
+                        <h5 th:text="${bookDto.bookName}">제목</h5>
+                        <p>저자: <span th:text="${bookDto.author}"></span></p>
+                        <p>출판사: <span th:text="${bookDto.publisher}"></span></p>
                     </div>
                 </a>
             </div>

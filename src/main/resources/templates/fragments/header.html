@@ -45,7 +45,7 @@
             <a  class="navbar-brand" th:href="@{/}"><span class="flaticon-pawprint-1 mr-2"></span>e북랜드</a>
             <div class="collapse navbar-collapse" id="ftco-nav" align="center">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item"><a th:href="@{/}" class="nav-link">메인페이지</a></li>
+                    <li class="nav-item"><a th:href="@{/bookboard/list}" class="nav-link">메인페이지</a></li>
                     <li class="nav-item"><a th:href="@{/freeboard/list}" class="nav-link">자유게시판</a></li>
                     <li class="nav-item"><a th:href="@{/noticeboard/list}" class="nav-link">공지사항</a></li>
                     <li class="nav-item"><a sec:authorize="hasRole('MEMBER')" th:href="@{/bookboard/mybook}" class="nav-link">책 읽기</a></li>

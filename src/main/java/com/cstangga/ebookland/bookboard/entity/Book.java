@@ -1,5 +1,6 @@
 package com.cstangga.ebookland.bookboard.entity;
 
+import com.cstangga.ebookland.bookboard.dto.BookModifyDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,23 +58,43 @@ public class Book {
     private double purchasePrice;
 
     @Column(name = "image_path") // 이미지 경로
-    private String imagePath;
+    private String imageName;
 
     // 책에 장르
     @Enumerated(EnumType.STRING) // enum을 string으로 관리, int로 관리하면 직관성이 떨어짐
-    @ElementCollection(fetch = FetchType.EAGER) // 컬렉션 객체임을 jpa가 알 수 있게 해줌, 지연 로딩
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "tbl_genre",
             joinColumns = @JoinColumn(name = "book_id") //
     )
+    @Column(name = "genre")
     private Set<BookGenre> bookGenres = new HashSet<>();
 
+
+    // 판매 방법
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
-            name = "tbl_transactiontype",
+            name = "tbl_sells_options",
             joinColumns = @JoinColumn(name = "book_id") //
     )
-    private Set<BookTransactionType> bookTransactionTypes=new HashSet<>();
+    private Set<SellsOptions> sellsOptions =new HashSet<>();
 
+    public void update(BookModifyDto dto)
+    {
+        this.bookName=dto.getBookName();
+        this.authorName=dto.getAuthorName();
+        this.publisherName=dto.getPublisherName();
+        this.bookDetails=dto.getBookDetails();
+        this.bookSummary=dto.getBookSummary();
+        this.rentalPrice=dto.getRentalPrice();
+        this.purchasePrice=dto.getPurchasePrice();
+        this.imageName =dto.getImageName();
+        this.bookGenres=dto.getBookGenre();
+        this.sellsOptions =dto.getSellsOptions();
+        if(!dto.getImageName().isEmpty())
+            this.imageName =dto.getImageName();
+
+
+    }
 }

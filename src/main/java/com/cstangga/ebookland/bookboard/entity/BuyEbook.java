@@ -11,13 +11,14 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-@Entity
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-@Table(name = "tbl_rental")
 @Builder
-public class Rental {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "tbl_buy_ebook")
+public class BuyEbook {
+
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
     private long id;
@@ -35,4 +36,10 @@ public class Rental {
 
     @Column(name = "book_id")
     private long bookId;
+
+    @Column(name = "total_amount")
+    private long totalAmount;
+
+    @Column(name = "total_price")
+    private long totalPrice;
 }
