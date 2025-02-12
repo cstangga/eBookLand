@@ -4,29 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>회원 관리</title>
+    <title>마이 페이지</title>
     <style>
+        /* 네비게이션 버튼 정렬 및 간격 추가 */
         .nav-tabs {
             display: flex;
             flex-wrap: nowrap;
             justify-content: center;
             border-bottom: none;
+            margin-bottom: 5%; /* 🔹 버튼과 섹션 사이 간격 추가 */
         }
+
         .nav-link {
             white-space: nowrap;
             padding: 15px 30px;
             font-size: 1.2rem;
             border-radius: 5px;
         }
+
         .nav-link.active {
             background-color: #007bff;
             color: white;
         }
-        .my-nav {
-            margin-bottom: 60px;
+
+        /* 입력 폼 정렬 */
+        .form-container {
+            max-width: 600px; /* 🔹 폼 너비 제한 */
+            margin: auto;
         }
-        .my-section-title {
-            margin-top: 60px;
+
+        /* 주소 입력 필드 정리 */
+        .address-group {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .address-group input {
+            flex: 1;
+            min-width: 45%; /* 🔹 필드 크기 조정 */
+        }
+
+        /* 섹션 스타일 */
+        .section-content {
+            max-width: 600px; /* 🔹 내용이 너무 넓지 않도록 제한 */
+            margin: auto;
         }
     </style>
 </head>
@@ -45,10 +67,11 @@
                 </nav>
 
                 <!-- 프로필 섹션 -->
-                <div id="profile">
-                    <h1>회원정보 수정</h1>
-                    <form th:action="@{/member/update}" method="post" id="updateForm">
+                <div id="profile" class="section-content">
+                    <h1 class="text-center">회원정보 수정</h1>
+                    <form th:action="@{/member/update}" method="post" id="updateForm" class="form-container">
                         <input type="hidden" th:value="${memberDto.memberId}" name="memberId" id="memberId">
+
                         <div class="mb-3">
                             <label for="name" class="form-label">이름</label>
                             <input type="text" th:value="${memberDto.memberName}" class="form-control" id="name" name="memberName" required>
@@ -57,42 +80,88 @@
                             <label for="phone" class="form-label">핸드폰 번호</label>
                             <input type="tel" th:value="${memberDto.memberPhone}" class="form-control" id="phone" name="memberPhone" required>
                         </div>
-                        <div class="form-row" style="margin-bottom: 10px">
-                            <div class="form-group col-md-12" style="margin-bottom: 5px">
-                                <label for="sample6_address">주소 *</label>
-                                <div style="display: flex; margin-bottom: 5px">
-                                    <input type="text" th:value="${memberDto.postCode}" class="form-control" id="sample6_postcode" name="postCode" placeholder="우편번호">
-                                    <input type="button" class="form-control" onclick="sample6_execDaumPostcode()" value="우편번호 찾기">
-                                </div>
-                                <input type="text" th:value="${memberDto.address}" class="form-control col-md-12" name="address" id="sample6_address" placeholder="주소">
+
+                        <!-- 주소 입력 필드 -->
+                        <div class="mb-3">
+                            <label for="sample6_address" class="form-label">주소 *</label>
+                            <div class="address-group">
+                                <input type="text" th:value="${memberDto.postCode}" class="form-control" id="sample6_postcode" name="postCode" placeholder="우편번호">
+                                <button type="button" class="btn btn-secondary" onclick="sample6_execDaumPostcode()">우편번호 찾기</button>
                             </div>
-                            <div style="display: flex" class="col-md-12">
+                            <input type="text" th:value="${memberDto.address}" class="form-control mt-2" name="address" id="sample6_address" placeholder="주소">
+                            <div class="address-group mt-2">
                                 <input type="text" th:value="${memberDto.detailAddress}" class="form-control" name="detailAddress" id="sample6_detailAddress" placeholder="상세주소">
                                 <input type="text" th:value="${memberDto.extraAddress}" class="form-control" name="extraAddress" id="sample6_extraAddress" placeholder="참고항목">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">수정</button>
+                        <button type="submit" class="btn btn-primary w-100">수정</button>
                     </form>
                 </div>
 
                 <!-- 구매 목록 섹션 -->
-                <div id="myBookList" style="display: none;">
-                    <h1>구매 목록페이지 입니다.</h1>
+                <div id="myBookList" class="section-content" style="display: none;">
+                    <h1 class="text-center">구매 목록</h1>
+
+                    <div class="scrollable-table-container">
+                        <table class="table table-striped text-center">
+                            <thead class="table-dark sticky-header">
+                            <tr>
+                                <th>책 표지</th>
+                                <th>제목</th>
+                                <th>구매/대여 날짜</th>
+                                <th>종료 날짜</th>
+                                <th>잔여 시간</th>
+                            </tr>
+                            </thead>
+                            <tbody class="scrollable-content">
+                            <tr th:each="dto,stat : ${allBuyInfoDtoList}">
+                                <!-- 책 표지 -->
+                                <td>
+                                    <img th:if="${not #strings.isEmpty(dto.imageName)}"
+                                         th:src="@{/bookImage/{imageName}(imageName=${dto.imageName})}"
+                                         alt="Book Cover" class="book-cover">
+                                    <img th:unless="${not #strings.isEmpty(dto.imageName)}"
+                                         th:src="@{/bookImage/noImage.PNG}"
+                                         alt="No Image" class="book-cover">
+                                </td>
+
+                                <!-- 책 제목 -->
+                                <td th:text="${dto.bookName}"></td>
+
+                                <!-- 구매/대여 날짜 -->
+                                <td th:text="${dto.buyDate}"></td>
+
+                                <!-- 종료 날짜 -->
+                                <td th:text="${dto.expiryDate}"></td>
+
+                                <!-- 잔여 시간 -->
+                                <td>
+                        <span th:if="${dto.remainingTime > 0}"
+                              th:text="|${dto.remainingTime} 시간|"></span>
+                                    <span th:unless="${dto.remainingTime > 0}"
+                                          class="text-danger">만료됨</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- 비밀번호 변경 섹션 -->
-                <div id="changePassword" style="display: none;">
-                    <h1>비밀번호 변경</h1>
-                    <div class="mb-3">
-                        <label for="currentPassword" class="form-label">현재 비밀번호</label>
-                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
-                        <button type="button" class="btn btn-secondary mt-2" onclick="checkPassword()">비밀번호 체크</button>
-                    </div>
-                    <div class="mb-3">
-                        <label for="newPassword" class="form-label">새로운 비밀번호</label>
-                        <input type="password" class="form-control" id="newPassword" name="newPassword" disabled required>
-                        <button type="button" class="btn btn-secondary mt-2" id="updatePasswordBtn" onclick="updatePassword()" disabled>비밀번호 변경</button>
-                    </div>
+                <div id="changePassword" class="section-content" style="display: none;">
+                    <h1 class="text-center">비밀번호 변경</h1>
+                    <form class="form-container">
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label">현재 비밀번호</label>
+                            <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                            <button type="button" class="btn btn-secondary mt-2 w-100" onclick="checkPassword()">비밀번호 체크</button>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">새로운 비밀번호</label>
+                            <input type="password" class="form-control" id="newPassword" name="newPassword" disabled required>
+                            <button type="button" class="btn btn-secondary mt-2 w-100" id="updatePasswordBtn" onclick="updatePassword()" disabled>비밀번호 변경</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

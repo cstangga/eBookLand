@@ -7,16 +7,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BuyBookDto {
+public class BuyEBookDto {
     private long bookId;
     private long memberId;
-    private int totalPrice;
-    private String buyOption;
-    private int totalAmount;
+    private long totalPrice;
+    private LocalDateTime buyDate;
+
 
     public BuyEbook dtoToEbookEntity() {
         return BuyEbook.builder()
@@ -26,12 +29,4 @@ public class BuyBookDto {
                 .build();
     }
 
-    public BuyPaperBook dtoToPaperBookEntity()
-    {
-        return BuyPaperBook.builder()
-                .bookId(bookId)
-                .memberId(memberId)
-                .totalPrice(totalPrice)
-                .totalAmount(totalAmount).build();
-    }
 }

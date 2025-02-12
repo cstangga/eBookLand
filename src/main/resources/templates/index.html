@@ -64,17 +64,15 @@
 </head>
 <body>
 <main class="container" layout:fragment="main">
-    <div>
-        <!-- Search Form -->
-        <form th:action="@{/bookboard/search}" method="post">
-            <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" name="type">
+    <!-- 저자, 책 이름으로 검색하기 -->
+    <div class="d-flex justify-content-center mt-5">
+        <form th:action="@{/bookboard/search}" method="post" class="d-flex align-items-center gap-2">
+            <select class="form-select w-auto" aria-label="검색 유형 선택" name="type">
                 <option value="author">저자</option>
                 <option value="bookName">책 이름</option>
             </select>
-            <label>
-                <input type="text" id="word" name="word" class="form-control">
-            </label>
-            <button type="submit" class="btn btn-primary mt-3">검색</button>
+            <input type="text" id="word" name="word" class="form-control w-50" style="flex-grow: 2;" placeholder="검색어 입력">
+            <button type="submit" class="btn btn-primary">검색</button>
         </form>
     </div>
 

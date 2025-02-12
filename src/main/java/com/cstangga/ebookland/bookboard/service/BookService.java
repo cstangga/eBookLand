@@ -1,9 +1,9 @@
 package com.cstangga.ebookland.bookboard.service;
 
 
+import com.cstangga.ebookland.bookboard.dto.AllBooksInfoDto;
+import com.cstangga.ebookland.bookboard.dto.BookListDto;
 import com.cstangga.ebookland.bookboard.dto.BookModifyDto;
-import com.cstangga.ebookland.bookboard.dto.BuyBookDto;
-import com.cstangga.ebookland.bookboard.dto.RentalBookDto;
 import com.cstangga.ebookland.bookboard.entity.Book;
 import com.cstangga.ebookland.bookboard.entity.BuyEbook;
 import com.cstangga.ebookland.bookboard.entity.BuyPaperBook;
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -98,10 +99,12 @@ public class BookService {
     }
 
     public List<Book> findByBookName(String bookName) {
+        log.info("BookService findByBookName");
         return bookRepository.findBookByBookNameContaining(bookName);
     }
 
     public List<Book> findByAuthorName(String authorName) {
+        log.info("BookService findByAuthorName");
         return bookRepository.findBookByAuthorNameContaining(authorName);
     }
 
@@ -119,25 +122,54 @@ public class BookService {
         bookRepository.deleteById(bookId);
     }
 
-    public void rentalBook(RentalBookDto dto) {
-        log.info("BookService rentalBook");
-        RentalEbook entity = dto.dtoToRentalEbook();
-        entity=rentalBookRepository.save(entity);
-        log.info("entity = {}",entity);
-        log.info("대여 시작 날짜 = {}",entity.getCreateAt());
-        log.info("대여 종료 날짜 = {}",entity.getExpirationDateTime());
+    public List<BookListDto> searchBook(String type, String word) {
+        log.info("BookService searchBook");
+        List<BookListDto> bookListDto = new ArrayList<>();
+        if(type.equals("bookName"))
+        {
+            List<Book> booksEntity =bookRepository.findBookByBookNameContaining(word);
+            for(Book book:booksEntity)
+            {
+                bookListDto.add(new BookListDto().entityToDto(book));
+            }
+        }
+        else{
+            List<Book> booksEntity = bookRepository.findBookByAuthorNameContaining(word);
+            for(Book book:booksEntity)
+            {
+                bookListDto.add(new BookListDto().entityToDto(book));
+            }
+        }
+        return bookListDto;
     }
 
-    public BuyEbook buyEbook(BuyBookDto dto) {
-        log.info("BookService buyEbook");
-        BuyEbook buyEbook=dto.dtoToEbookEntity();
-        return buyEbookRepository.save(buyEbook);
-    }
+    public List<AllBooksInfoDto> findAllBook(long id)
+    {
+        log.info("bookService findAllBook");
+        List<AllBooksInfoDto> allBooksInfoDtoList = new ArrayList<>();
+        for(BuyPaperBook entity : buyPaperBookRepository.findAllByMemberId(id))
+        {
+            Book book = bookRepository.findBookById(entity.getBookId());
+            AllBooksInfoDto dto = entity.toInfoDto(entity);
+            dto.setImageName(book.getImageName());
+            allBooksInfoDtoList.add(dto);
+        }
 
-    public BuyPaperBook buyPaperBook(BuyBookDto dto) {
-        // 낙관적 락 걸어야 함
-        BuyPaperBook buyPaperBook=dto.dtoToPaperBookEntity();
-        buyPaperBook.decrease(dto.getTotalAmount());
-        return buyPaperBookRepository.save(buyPaperBook);
+        for(BuyEbook entity : buyEbookRepository.findAllByMemberId(id))
+        {
+            Book book = bookRepository.findBookById(entity.getBookId());
+            AllBooksInfoDto dto = entity.toInfoDto(entity);
+            dto.setImageName(book.getImageName());
+            allBooksInfoDtoList.add(dto);
+        }
+
+        for(RentalEbook entity : rentalBookRepository.findAllByMemberId(id))
+        {
+            Book book = bookRepository.findBookById(entity.getBookId());
+            AllBooksInfoDto dto = entity.toInfoDto(entity);
+            dto.setImageName(book.getImageName());
+            allBooksInfoDtoList.add(dto);
+        }
+        return allBooksInfoDtoList;
     }
 }

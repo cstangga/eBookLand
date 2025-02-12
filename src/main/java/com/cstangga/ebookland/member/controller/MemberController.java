@@ -1,21 +1,29 @@
 package com.cstangga.ebookland.member.controller;
 
 import com.cstangga.ebookland.auth.principal.AuthPrincipal;
+import com.cstangga.ebookland.bookboard.dto.AllBooksInfoDto;
+import com.cstangga.ebookland.bookboard.dto.BuyEBookDto;
+import com.cstangga.ebookland.bookboard.dto.BuyPaperBookDto;
+import com.cstangga.ebookland.bookboard.dto.RentalBookDto;
+import com.cstangga.ebookland.bookboard.service.BookService;
+import com.cstangga.ebookland.bookboard.service.EBookService;
+import com.cstangga.ebookland.bookboard.service.PaperBookService;
+import com.cstangga.ebookland.bookboard.service.RentalEBookService;
 import com.cstangga.ebookland.member.dto.MemberDto;
 import com.cstangga.ebookland.member.dto.SignupDto;
 import com.cstangga.ebookland.member.entity.Member;
 import com.cstangga.ebookland.member.service.MemberService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -24,6 +32,10 @@ import java.security.Principal;
 public class MemberController {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
+    private final RentalEBookService rentalEBookService;
+    private final EBookService eBookService;
+    private final PaperBookService paperBookService;
+    private final BookService bookService;
 
     @GetMapping("/signup")
     public void signup(){
@@ -57,7 +69,9 @@ public class MemberController {
         log.info("dto = {}", dto);
         model.addAttribute("memberDto",dto);
 
-        // 대여, 구매(Ebook, offline) 목록 나와야 함
+        List<AllBooksInfoDto> allBooksInfoDtoList=bookService.findAllBook(dto.getMemberId());
+
+        model.addAttribute("allBuyInfoDtoList",allBooksInfoDtoList);
 
     }
 

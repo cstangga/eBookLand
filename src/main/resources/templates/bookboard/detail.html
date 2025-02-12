@@ -133,8 +133,9 @@
 
             <div class="text-center mt-4">
 
-                <button type="button" id="buyBtn" class="btn btn-primary" onclick="checkAndBuyBook()">구매하기</button>
-                <button type="button" id="rentalBtn" class="btn btn-primary" onclick="checkAndRental()">대여하기</button>
+                <button type="button" id="buyEBookBtn" class="btn btn-primary" onclick="checkAndBuyEBook()">전자책 구매</button>
+                <button type="button" id="buyPaperBookBtn" class="btn btn-primary" onclick="checkAndBuyPaperBook()">종이책 구매</button>
+                <button type="button" id="rentalBtn" class="btn btn-primary" onclick="checkAndRental()">전자책 대여</button>
                 <a sec:authorize="hasRole('ADMIN')" class="btn btn-primary"
                    th:href="@{|/bookboard/modifybook/${bookDto.bookId}|}">
                     수정
@@ -151,12 +152,14 @@
             const dynamicInput = document.getElementById('dynamicInput');
             const dynamicLabel = document.getElementById('dynamicLabel');
             const rentalBtn = document.getElementById('rentalBtn');
-            const buyBtn = document.getElementById('buyBtn');
+            const buyEBookBtn = document.getElementById('buyEBookBtn');
+            const buyPaperBtn = document.getElementById('buyPaperBookBtn');
 
             inputField.value = "";
             dynamicInput.style.display = 'block';  // 입력 필드 기본적으로 보이게 설정
             rentalBtn.style.display = 'none'; // 버튼 초기 숨김
-            buyBtn.style.display = 'none';   // 버튼 초기 숨김
+            buyEBookBtn.style.display = 'none';   // 버튼 초기 숨김
+            buyPaperBtn.style.display = 'none';   // 버튼 초기 숨김
 
             if (toggle === 'rentalEbookToggle') {
                 dynamicLabel.innerText = '대여 기간 (일)';
@@ -165,10 +168,10 @@
             } else if (toggle === 'paperBookToggle') {
                 dynamicLabel.innerText = '구매 권 수';
                 inputField.placeholder = '구매할 권 수를 입력하세요';
-                buyBtn.style.display = 'inline-block'; // "구매하기" 버튼 표시
+                buyPaperBtn.style.display = 'inline-block'; // "구매하기" 버튼 표시
             } else {
                 dynamicInput.style.display = 'none'; // 입력 필드 숨김
-                buyBtn.style.display = 'inline-block'; // "구매하기" 버튼 표시 (전자책 구매)
+                buyEBookBtn.style.display = 'inline-block'; // "구매하기" 버튼 표시 (전자책 구매)
             }
 
             calculateTotal(); // 총 가격 계산
@@ -199,55 +202,97 @@
         }
     </script>
     <script th:inline="javascript">
-        function checkAndBuyBook() {
+        function checkAndBuyPaperBook() {
             const bookId = document.getElementById('bookId').value; //
             const memberId = document.getElementById('memberId').value;
-            let totalPrice = document.getElementById('totalPrice'); // 전체 가격
-            let inputField= document.getElementById('inputField'); // 몇 권인지
+            let inputField = document.getElementById('inputField'); // 몇 권인지 입력 필드
             const paperBook_toggle = document.getElementById('paperBookToggle').checked;
+            const bookName = [[${bookDto.bookName}]];
+
+            let totalAmount = parseInt(inputField.value || 0);
+            if (!paperBook_toggle) {
+                alert("구매 방법을 선택해주세요");
+                return;
+            }
+            if (totalAmount <= 0) {
+                alert("구매 수량이 0보다 작을 수 없습니다.");
+                return;
+            }
+
+            // 🔹 최신 총 가격 계산
+            calculateTotal();
+
+            // 🔹 쉼표 제거 후 숫자로 변환
+            let totalPrice = document.getElementById('totalPrice').innerText;
+            let totalPriceValue = parseInt(totalPrice.replace(/,/g, '')) || 0;
+
+            console.log("bookId: " + bookId, "memberId : " + memberId, "bookName : " + bookName);
+            console.log("totalPrice: " + totalPriceValue, "totalAmount: " + totalAmount);
+
+            if (confirm("구매 하시겠습니까??")) {
+                $.ajax({
+                    url: '/paperbook/buyPaperBook',
+                    method: 'post',
+                    processData: true, // false = formData를 string으로 변환하지 않음
+                    data: {
+                        bookId: bookId,
+                        memberId: memberId,
+                        totalAmount: totalAmount,
+                        totalPrice: totalPriceValue, // ✅ 수정된 totalPrice 사용
+                    },
+                    success(responseText) {
+                        alert("종이책 구매가 완료됐습니다.");
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX 요청 실패:", error);
+                        alert("구매 요청 중 오류가 발생했습니다. 다시 시도해주세요.");
+                    }
+                });
+            }
+        }
+    </script>
+    <script th:inline="javascript">
+        function checkAndBuyEBook() {
+            const bookId = document.getElementById('bookId').value;
+            const memberId = document.getElementById('memberId').value;
             const ebook_toggle = document.getElementById('ebookToggle').checked;
             const bookName = [[${bookDto.bookName}]];
-            let buyOption;
 
-            let totalAmount=parseInt(inputField.value || 0);
-            if (paperBook_toggle) {
-                if(totalAmount<=0) {
-                    alert("구매 수량이 0보다 작을 수 없습니다.");
-                    return;
-                }
-                buyOption="paperBook";
-            }else if (ebook_toggle) {
-                buyOption="ebook";
-                totalAmount=1;
-            }
-            else{
+            if (!ebook_toggle) {
                 alert("구매 방법을 선택해주세요");
                 return;
             }
 
-            confirm("구매 하시겠습니까??")
-            {
-                console.log("bookId: " + bookId, "memberId : "+memberId, "bookName : "+bookName, "buyOption : "+buyOption);
-                console.log("totalPrice: " + totalPrice.value, "totalAmount" + totalAmount.value);
+            // 최신 총 가격 계산
+            calculateTotal();
+
+            let totalPrice = document.getElementById('totalPrice').innerText;
+            let totalPriceValue = parseInt(totalPrice.replace(/,/g, '')) || 0;
+
+            console.log("bookId: " + bookId, "memberId: " + memberId, "bookName: " + bookName);
+            console.log("totalPrice: " + totalPriceValue);
+
+            if (confirm("전자책을 구매하시겠습니까?")) {
                 $.ajax({
-
-                    url: '/bookboard/buyEbook',
-                    method: 'post',
-                    processData: true, // false = formData를 string으로 변환하지 않음
-                    data:{
-                        bookId:bookId,
-                        buyOption : buyOption,
-                        memberId : memberId,
-                        totalAmount:totalAmount,
-                        totalPrice: totalPrice.value,
+                    url: '/ebook/buyEBook',
+                    method: 'POST',
+                    data: {
+                        bookId: bookId,
+                        memberId: memberId,
+                        totalAmount: 1,
+                        totalPrice: totalPriceValue,
                     },
-
-                    success(responseText) {
-                        alert("전자책 구매가 완료됐습니다.")
+                    success: function(response) {
+                        alert("전자책 구매가 완료되었습니다.");
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX 요청 실패:", error);
+                        alert("구매 요청 중 오류가 발생했습니다. 다시 시도해주세요.");
                     }
-                })
+                });
             }
-
         }
     </script>
 
@@ -270,21 +315,20 @@
                 return;
             }
 
-            // 🔹 최신 총 가격 계산
+            // 최신 총 가격 계산
             calculateTotal();
 
-            // 🔹 쉼표 제거 후 숫자로 변환
             let totalPrice = document.getElementById('totalPrice').innerText;
             let totalPriceValue = parseInt(totalPrice.replace(/,/g, '')) || 0;
 
-            console.log("bookIdddd: " + bookId, "memberId: " + memberId, "rentalDays: " + rentalDays);
+            console.log("bookId: " + bookId, "memberId: " + memberId, "rentalDays: " + rentalDays);
             console.log("totalPrice: " + totalPriceValue);
 
             if (confirm("전자책을 대여하시겠습니까?")) {
                 $.ajax({
-                    url: '/bookboard/rentalEbook',
+                    url: '/rental/rentalEbook',
                     method: 'POST',
-                    data:{
+                    data: {
                         bookId: bookId,
                         rentalDays: rentalDays,
                         memberId: memberId,

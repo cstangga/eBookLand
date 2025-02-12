@@ -5,11 +5,11 @@ import com.cstangga.ebookland.bookboard.dto.*;
 import com.cstangga.ebookland.bookboard.entity.Book;
 import com.cstangga.ebookland.bookboard.entity.BuyEbook;
 import com.cstangga.ebookland.bookboard.entity.BuyPaperBook;
-import com.cstangga.ebookland.bookboard.entity.RentalEbook;
-import com.cstangga.ebookland.bookboard.repository.BookRepository;
-import com.cstangga.ebookland.bookboard.repository.RentalBookRepository;
 import com.cstangga.ebookland.bookboard.service.BookService;
 
+import com.cstangga.ebookland.bookboard.service.EBookService;
+import com.cstangga.ebookland.bookboard.service.PaperBookService;
+import com.cstangga.ebookland.bookboard.service.RentalEBookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +29,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookController {
     private final BookService bookService;
-    private final RentalBookRepository rentalBookRepository;
+    private final PaperBookService paperBookService;
+    private final RentalEBookService rentalEBookService;
+    private final EBookService ebookService;
 
     @GetMapping("/list")
     public void list(Model model) {
@@ -113,69 +115,21 @@ public class BookController {
         log.info("GET /bookboard/research");
         log.info("word = {}",word);
         log.info("type = {}",type);
-        List<BookListDto> bookDtoList=new ArrayList<>();
-        if(type.equals("bookName"))
-        {
-            List<Book> booksEntity = bookService.findByBookName(word);
-            for(Book book:booksEntity)
-            {
-                bookDtoList.add(new BookListDto().entityToDto(book));
-            }
-        }
-        else{
-            List<Book> booksEntity = bookService.findByAuthorName(word);
-            for(Book book:booksEntity)
-            {
-                bookDtoList.add(new BookListDto().entityToDto(book));
-            }
-        }
+
+        List<BookListDto> bookDtoList=bookService.searchBook(type,word);
+
         log.info("bookDtoList = {}",bookDtoList);
+
         model.addAttribute("bookDtoList",bookDtoList);
-        return "/";
+        return "/bookboard/list";
     }
 
-    @PostMapping("/buyBook")
-    public String buyBook(@ModelAttribute BuyBookDto dto)
-    {
-        log.info("POST /bookboard/buyBook");
-        log.info("dto = {}",dto);
-        if(dto.getBuyOption().equals("eBook"))
-        {
-            BuyEbook buyEbookEntity=bookService.buyEbook(dto);
-            log.info("buyEbookEntity = {}",buyEbookEntity);
-        }
-        else{
-            BuyPaperBook buyPaperBook=bookService.buyPaperBook(dto);
-            log.info("buyPaperBook = {}",buyPaperBook);
-        }
-
-        return String.format("redirect:/bookboard/detail/%d",dto.getBookId());
-    }
-
-    @PostMapping("/rentalEbook")
-    @ResponseBody
-    public String rentalEbook(@ModelAttribute RentalBookDto dto)
-    {
-        log.info("POST /bookboard/rentalEbook");
-        log.info("dto = {}",dto);
-        bookService.rentalBook(dto);
-        return "success";
-    }
 
     @GetMapping("/modifybook")
     private void modifybook(){
         log.info("GET /bookboard/modifybook");
     }
 
-    @GetMapping("/rental")
-    private void rental(){
-        log.info("GET /bookboard/rental");
-    }
-
-    @GetMapping("/purchase")
-    private void purchase(){
-        log.info("GET /bookboard/purchase");
-    }
 
     @GetMapping("/mybook")
     public void myBook(@AuthenticationPrincipal AuthPrincipal authPrincipal, Model model) {

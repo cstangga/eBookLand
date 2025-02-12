@@ -57,6 +57,9 @@ public class Book {
     @Column(name = "purchase_price") // 구매 시 가격
     private double purchasePrice;
 
+    @Version
+    private long version;
+
     @Column(name = "image_path") // 이미지 경로
     private String imageName;
 
@@ -94,7 +97,10 @@ public class Book {
         this.sellsOptions =dto.getSellsOptions();
         if(!dto.getImageName().isEmpty())
             this.imageName =dto.getImageName();
+    }
 
-
+    public int decrease(int amount)
+    {
+        return this.amount-=amount;
     }
 }

@@ -1,6 +1,8 @@
 package com.cstangga.ebookland.bookboard.entity;
 
 
+import com.cstangga.ebookland.bookboard.dto.AllBooksInfoDto;
+import com.cstangga.ebookland.bookboard.dto.BuyEBookDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +12,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 @Builder
 @Data
@@ -37,9 +41,24 @@ public class BuyEbook {
     @Column(name = "book_id")
     private long bookId;
 
-    @Column(name = "total_amount")
-    private long totalAmount;
-
     @Column(name = "total_price")
     private long totalPrice;
+
+    public BuyEBookDto toDto(BuyEbook entity) {
+        return BuyEBookDto.builder()
+                .bookId(entity.bookId)
+                .memberId(entity.memberId)
+                .totalPrice(entity.totalPrice)
+                .buyDate(entity.createAt).build();
+    }
+
+    public AllBooksInfoDto toInfoDto(BuyEbook entity) {
+        return AllBooksInfoDto.builder()
+                .bookId(entity.getBookId())
+                .buyBuyOptions(SellsOptions.PAPER_BOOK)
+                .buyDate(entity.getCreateAt().format( DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .totalPrice(entity.getTotalPrice()).build();
+    }
+
+
 }
