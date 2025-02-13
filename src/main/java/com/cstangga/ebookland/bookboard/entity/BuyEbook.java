@@ -55,7 +55,7 @@ public class BuyEbook {
     public AllBooksInfoDto toInfoDto(BuyEbook entity) {
         return AllBooksInfoDto.builder()
                 .bookId(entity.getBookId())
-                .buyBuyOptions(SellsOptions.PAPER_BOOK)
+                .buyBuyOptions("전자책 구매")
                 .buyDate(entity.getCreateAt().format( DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .totalPrice(entity.getTotalPrice()).build();
     }

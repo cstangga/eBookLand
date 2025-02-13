@@ -113,6 +113,8 @@ public class BookService {
     }
 
     public void update(BookModifyDto dto) {
+        log.info("bookService update");
+        log.info("dto = {}",dto);
         Book entity = bookRepository.findBookById(dto.getBookId());
         entity.update(dto);
         bookRepository.save(entity);
@@ -151,6 +153,7 @@ public class BookService {
         {
             Book book = bookRepository.findBookById(entity.getBookId());
             AllBooksInfoDto dto = entity.toInfoDto(entity);
+            dto.setBookName(book.getBookName());
             dto.setImageName(book.getImageName());
             allBooksInfoDtoList.add(dto);
         }
@@ -159,6 +162,7 @@ public class BookService {
         {
             Book book = bookRepository.findBookById(entity.getBookId());
             AllBooksInfoDto dto = entity.toInfoDto(entity);
+            dto.setBookName(book.getBookName());
             dto.setImageName(book.getImageName());
             allBooksInfoDtoList.add(dto);
         }
@@ -167,6 +171,7 @@ public class BookService {
         {
             Book book = bookRepository.findBookById(entity.getBookId());
             AllBooksInfoDto dto = entity.toInfoDto(entity);
+            dto.setBookName(book.getBookName());
             dto.setImageName(book.getImageName());
             allBooksInfoDtoList.add(dto);
         }

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -49,9 +50,11 @@ public class RentalEbook {
     private LocalDateTime expirationDateTime;
 
     public RentalBookDto toDto(Book entity) {
-        long remainingDays=createAt.until(expirationDateTime, ChronoUnit.DAYS);
-        long remainingHours=createAt.until(expirationDateTime, ChronoUnit.HOURS);
-        long remainingMinutes=createAt.until(expirationDateTime, ChronoUnit.MINUTES);
+        Duration duration=Duration.between(LocalDateTime.now(), expirationDateTime);
+        long remainingDays=duration.toDays();
+        long remainingHours=duration.toHours()%24;
+        long remainingMinutes=duration.toMinutes()%60;
+
         return RentalBookDto.builder()
                 .memberId(entity.getId())
                 .bookId(entity.getId())
@@ -64,14 +67,20 @@ public class RentalEbook {
     }
 
     public AllBooksInfoDto toInfoDto(RentalEbook entity) {
-        long remainingDays=createAt.until(expirationDateTime, ChronoUnit.DAYS);
-        long remainingHours=createAt.until(expirationDateTime, ChronoUnit.HOURS);
+        Duration duration=Duration.between(LocalDateTime.now(), expirationDateTime);
+        long remainingDays=duration.toDays();
+        long remainingHours=duration.toHours()%24;
+        long remainingMinutes=duration.toMinutes()%60;
 
         return AllBooksInfoDto.builder()
                 .bookId(entity.getBookId())
-                .buyBuyOptions(SellsOptions.PAPER_BOOK)
                 .buyDate(entity.getCreateAt().format( DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .expiryDate(entity.getExpirationDateTime().format(  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .remainingDays(remainingDays)
+                .remainingHours(remainingHours)
+                .remainingMinutes(remainingMinutes)
+                .remainingStatus(LocalDateTime.now().compareTo(expirationDateTime)) // 조회날짜 - 만료날짜
+                .buyBuyOptions("전자책 대여")
                 .totalPrice(entity.getTotalPrice()).build();
     }
 }

@@ -46,6 +46,9 @@ public class BuyPaperBook {
     @Column(name = "total_amount")
     private int totalAmount;
 
+    @Version
+    private long version;
+
     public BuyPaperBookDto toDto(BuyPaperBook entity) {
         return BuyPaperBookDto.builder()
                 .bookId(entity.bookId)
@@ -57,7 +60,7 @@ public class BuyPaperBook {
     public AllBooksInfoDto toInfoDto(BuyPaperBook entity) {
         return AllBooksInfoDto.builder()
                 .bookId(entity.getBookId())
-                .buyBuyOptions(SellsOptions.PAPER_BOOK)
+                .buyBuyOptions("종이책 구매")
                 .buyDate(entity.getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .totalAmount(entity.getTotalAmount())
                 .totalPrice(entity.getTotalPrice()).build();
