@@ -94,11 +94,11 @@
         </form>
     </div>
 
-    <!-- 📚 검색 결과 -->
+    <!-- 검색 결과 -->
     <div class="search-results-container">
         <div class="search-results-grid" id="searchResults">
             <div th:each="bookDto : ${bookDtoList}" th:object="${bookDto}" class="search-item">
-                <a th:href="@{|/bookboard/modifybook/${bookDto.bookId}|}" class="item-link">
+                <a th:href="@{|/bookboard/detail/${bookDto.bookId}|}" class="item-link">
                     <!-- 도서 표지 -->
                     <img th:if="${#strings.isEmpty(bookDto.imageName)}"
                          th:src="@{/bookImage/noImage.PNG}" alt="No Image" class="book-image">
