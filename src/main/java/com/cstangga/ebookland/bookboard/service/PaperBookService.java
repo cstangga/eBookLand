@@ -35,17 +35,18 @@ public class PaperBookService {
         }
         else{
             book.decrease(dto.getTotalAmount());
-            BuyPaperBook buyPaperBook = dto.dtoToPaperBookEntity();
+            BuyPaperBook buyPaperBook = dto.dtoToPaperBookEntity(book);
             buyPaperBookRepository.save(buyPaperBook);
             return true;
         }
     }
 
     public List<BuyPaperBookDto> findAllPaperBookById(long memberId) {
+        // 회원이 구매한 모든 종이책 정보를 가져온다, fetch join
         List<BuyPaperBookDto> buyPaperBookDtoList = new ArrayList<>();
 
         for(BuyPaperBook entity:buyPaperBookRepository.findAllByMemberId(memberId)) {
-            BuyPaperBookDto buyPaperBookDto = entity.toDto(entity);
+            BuyPaperBookDto buyPaperBookDto = entity.toDto();
             buyPaperBookDtoList.add(buyPaperBookDto);
         }
         return buyPaperBookDtoList;

@@ -3,8 +3,6 @@ package com.cstangga.ebookland.bookboard.controller;
 import com.cstangga.ebookland.auth.principal.AuthPrincipal;
 import com.cstangga.ebookland.bookboard.dto.*;
 import com.cstangga.ebookland.bookboard.entity.Book;
-import com.cstangga.ebookland.bookboard.entity.BuyEbook;
-import com.cstangga.ebookland.bookboard.entity.BuyPaperBook;
 import com.cstangga.ebookland.bookboard.service.BookService;
 
 import com.cstangga.ebookland.bookboard.service.EBookService;
@@ -36,9 +34,9 @@ public class BookController {
     @GetMapping("/list")
     public void list(Model model) {
         List<Book> books = bookService.findAll();
-        List<BookListDto> bookDtoList = new ArrayList<>();
+        List<BookDtoList> bookDtoList = new ArrayList<>();
         for (Book book : books) {
-            bookDtoList.add(new BookListDto().entityToDto(book));
+            bookDtoList.add(new BookDtoList().entityToDto(book));
         }
         model.addAttribute("bookDtoList", bookDtoList);
     }
@@ -70,13 +68,14 @@ public class BookController {
         return "/bookboard/modifybook";
     }
 
-    @GetMapping("/detail/{bookId}") // 사용자가 보는 detail
-    public String detail(@PathVariable("bookId") long bookId, Model model)
+    @GetMapping("/detail/{bookId}") // 구매하기 위한 페이지
+    public String  detail(@PathVariable("bookId") long bookId, Model model)
     {
         log.info("GET /bookboard/detail/{}",bookId);
-        BookModifyDto bookDto=new BookModifyDto().entityToDto(bookService.findByBookId(bookId));
-        log.info("bookDto = {}",bookDto);
-        model.addAttribute("bookDto",bookDto);
+
+        BookModifyDto dto=new BookModifyDto().entityToDto(bookService.findByBookId(bookId));
+        log.info("bookDto = {}",dto);
+        model.addAttribute("bookDto",dto);
         return "/bookboard/detail";
     }
 
@@ -116,7 +115,7 @@ public class BookController {
         log.info("word = {}",word);
         log.info("type = {}",type);
 
-        List<BookListDto> bookDtoList=bookService.searchBook(type,word);
+        List<BookDtoList> bookDtoList=bookService.searchBook(type,word);
 
         log.info("bookDtoList = {}",bookDtoList);
 
@@ -130,11 +129,4 @@ public class BookController {
         log.info("GET /bookboard/modifybook");
     }
 
-
-    @GetMapping("/mybook")
-    public void myBook(@AuthenticationPrincipal AuthPrincipal authPrincipal, Model model) {
-        log.info("GET /bookboard/myBook");
-        log.info("principal = {}", authPrincipal.getUsername());
-
-    }
 }

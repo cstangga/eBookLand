@@ -11,15 +11,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BookListDto {
+public class BookDtoList {
     private long bookId;
     private String bookName;
     private String author;
     private String publisher;
     private String imageName;
 
-    public BookListDto entityToDto(Book entity) {
-        return BookListDto.builder()
+    public BookDtoList entityToDto(Book entity) {
+        return BookDtoList.builder()
                 .bookId(entity.getId())
                 .bookName(entity.getBookName())
                 .author(entity.getAuthorName())

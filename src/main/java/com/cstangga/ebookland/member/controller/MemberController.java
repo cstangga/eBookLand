@@ -1,10 +1,10 @@
 package com.cstangga.ebookland.member.controller;
 
 import com.cstangga.ebookland.auth.principal.AuthPrincipal;
-import com.cstangga.ebookland.bookboard.dto.AllBooksInfoDto;
-import com.cstangga.ebookland.bookboard.dto.BuyEBookDto;
-import com.cstangga.ebookland.bookboard.dto.BuyPaperBookDto;
-import com.cstangga.ebookland.bookboard.dto.RentalBookDto;
+import com.cstangga.ebookland.bookboard.dto.*;
+import com.cstangga.ebookland.bookboard.entity.BuyPaperBook;
+import com.cstangga.ebookland.bookboard.repository.BuyEbookRepository;
+import com.cstangga.ebookland.bookboard.repository.BuyPaperBookRepository;
 import com.cstangga.ebookland.bookboard.service.BookService;
 import com.cstangga.ebookland.bookboard.service.EBookService;
 import com.cstangga.ebookland.bookboard.service.PaperBookService;
@@ -21,8 +21,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -36,6 +34,8 @@ public class MemberController {
     private final EBookService eBookService;
     private final PaperBookService paperBookService;
     private final BookService bookService;
+    private final BuyPaperBookRepository buyPaperBookRepository;
+    private final BuyEbookRepository buyEbookRepository;
 
     @GetMapping("/signup")
     public void signup(){
@@ -75,6 +75,7 @@ public class MemberController {
 
     }
 
+
     @PostMapping("/update")
     public String update(@ModelAttribute MemberDto dto,Model model)
     {
@@ -104,6 +105,19 @@ public class MemberController {
         log.info("password : {}", password);
         log.info("memberId : {}", memberId);
         return memberService.checkPassword(memberId,password);
+    }
+
+    @GetMapping("/mybook")
+    public void myBook(@AuthenticationPrincipal AuthPrincipal authPrincipal, Model model) {
+        log.info("GET /bookboard/myBook");
+        log.info("principal = {}", authPrincipal.getUsername());
+
+        long memberId=authPrincipal.getMember().getId();
+        List<RentalEBookDto> rentalEBookDtoList = rentalEBookService.findAllRentalEbookById(memberId);
+        List<BuyEBookDto> buyEBookDtoList = eBookService.findAllEBookById(memberId);
+
+        model.addAttribute("rentalEBookDtoList",rentalEBookDtoList);
+        model.addAttribute("buyEBookDtoList",buyEBookDtoList);
     }
 
 

@@ -1,7 +1,9 @@
 package com.cstangga.ebookland.bookboard.controller;
 
 import com.cstangga.ebookland.bookboard.dto.BuyEBookDto;
+import com.cstangga.ebookland.bookboard.entity.Book;
 import com.cstangga.ebookland.bookboard.entity.BuyEbook;
+import com.cstangga.ebookland.bookboard.service.BookService;
 import com.cstangga.ebookland.bookboard.service.EBookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class EBookController {
     private final EBookService ebookService;
+    private final BookService bookService;
 
     @PostMapping("/buyEBook")
     public String buyBook(@ModelAttribute BuyEBookDto dto)

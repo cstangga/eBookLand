@@ -3,6 +3,7 @@ package com.cstangga.ebookland.bookboard.entity;
 
 import com.cstangga.ebookland.bookboard.dto.AllBooksInfoDto;
 import com.cstangga.ebookland.bookboard.dto.BuyEBookDto;
+import com.cstangga.ebookland.bookboard.dto.MyBookDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 
 @Builder
 @Data
@@ -38,26 +38,39 @@ public class BuyEbook {
     @Column(name = "member_id")
     private long memberId;
 
-    @Column(name = "book_id")
-    private long bookId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE) // BookEntity과 삭제되면 같이 삭제 됨
+    @JoinColumn(name = "book_id", referencedColumnName = "id")
+    private Book book;
 
     @Column(name = "total_price")
     private long totalPrice;
 
-    public BuyEBookDto toDto(BuyEbook entity) {
+    public BuyEBookDto toDto() {
         return BuyEBookDto.builder()
-                .bookId(entity.bookId)
-                .memberId(entity.memberId)
-                .totalPrice(entity.totalPrice)
-                .buyDate(entity.createAt).build();
+                .bookId(book.getId())
+                .imageName(book.getImageName())
+                .memberId(memberId)
+                .totalPrice(totalPrice)
+                .buyDate(createAt).build();
     }
 
-    public AllBooksInfoDto toInfoDto(BuyEbook entity) {
+    public AllBooksInfoDto toInfoDto() {
         return AllBooksInfoDto.builder()
-                .bookId(entity.getBookId())
+                .bookName(book.getBookName())
+                .bookId(book.getId())
+                .imageName(book.getImageName())
+                .bookName(book.getBookName())
                 .buyBuyOptions("전자책 구매")
-                .buyDate(entity.getCreateAt().format( DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                .totalPrice(entity.getTotalPrice()).build();
+                .buyDate(createAt.format( DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .totalPrice(totalPrice).build();
+    }
+
+    public MyBookDto toMyBookDto() {
+        return MyBookDto.builder()
+                .bookId(book.getId())
+                .buyBuyOptions("전자책 구매")
+                .buyDate(createAt.format( DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .totalPrice(totalPrice).build();
     }
 
 

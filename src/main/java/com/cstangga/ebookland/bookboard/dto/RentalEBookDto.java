@@ -1,6 +1,7 @@
 package com.cstangga.ebookland.bookboard.dto;
 
 
+import com.cstangga.ebookland.bookboard.entity.Book;
 import com.cstangga.ebookland.bookboard.entity.RentalEbook;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RentalBookDto {
+public class RentalEBookDto {
 
     private long bookId;
     private long rentalId;
@@ -27,11 +28,12 @@ public class RentalBookDto {
     private long remainingDay; // 며칠 남았는지
     private long remainingHours; // 몇시간 남았는지
     private long remainingMinutes; // 몇시간 남았는지
+    private String imageName;
 
 
-    public RentalEbook dtoToRentalEbook() {
+    public RentalEbook dtoToRentalEbookEntity(Book book) {
         return RentalEbook.builder()
-                .bookId(bookId)
+                .book(book)
                 .memberId(memberId)
                 .totalPrice(totalPrice)
                 .expirationDateTime(LocalDateTime.now().plusDays(rentalDays)).build();

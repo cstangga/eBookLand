@@ -1,7 +1,6 @@
 package com.cstangga.ebookland.bookboard.repository;
 
 
-import com.cstangga.ebookland.bookboard.dto.RentalBookDto;
 import com.cstangga.ebookland.bookboard.entity.Book;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;

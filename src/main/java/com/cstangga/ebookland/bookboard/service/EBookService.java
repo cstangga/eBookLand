@@ -1,7 +1,9 @@
 package com.cstangga.ebookland.bookboard.service;
 
 import com.cstangga.ebookland.bookboard.dto.BuyEBookDto;
+import com.cstangga.ebookland.bookboard.entity.Book;
 import com.cstangga.ebookland.bookboard.entity.BuyEbook;
+import com.cstangga.ebookland.bookboard.repository.BookRepository;
 import com.cstangga.ebookland.bookboard.repository.BuyEbookRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +17,12 @@ import java.util.List;
 @Slf4j
 public class EBookService {
     private final BuyEbookRepository buyEbookRepository;
+    private final BookRepository bookRepository;
 
     public BuyEbook buyEbook(BuyEBookDto dto) {
         log.info("BookService buyEbook");
-        BuyEbook buyEbook=dto.dtoToEbookEntity();
+        Book book=bookRepository.findBookById(dto.getBookId());
+        BuyEbook buyEbook=dto.dtoToEbookEntity(book);
         return buyEbookRepository.save(buyEbook);
     }
 
@@ -27,9 +31,10 @@ public class EBookService {
         List<BuyEBookDto> buyEBookDtoList = new ArrayList<>();
 
         for(BuyEbook entity:buyEbookRepository.findAllByMemberId(id)){
-            BuyEBookDto buyEBookDto=entity.toDto(entity);
+            BuyEBookDto buyEBookDto=entity.toDto();
             buyEBookDtoList.add(buyEBookDto);
         }
         return buyEBookDtoList;
     }
+
 }

@@ -1,8 +1,7 @@
 package com.cstangga.ebookland.bookboard.entity;
 
 import com.cstangga.ebookland.bookboard.dto.AllBooksInfoDto;
-import com.cstangga.ebookland.bookboard.dto.BuyEBookDto;
-import com.cstangga.ebookland.bookboard.dto.RentalBookDto;
+import com.cstangga.ebookland.bookboard.dto.RentalEBookDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,9 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 
 @Builder
 @Data
@@ -40,25 +37,28 @@ public class RentalEbook {
     @Column(name = "member_id")
     private long memberId;
 
-    @Column(name = "book_id")
-    private long bookId;
-
     @Column(name = "total_price")
     private long totalPrice;
 
     @Column(name = "Expiration_date_time")
     private LocalDateTime expirationDateTime;
 
-    public RentalBookDto toDto(Book entity) {
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE) // BookEntity과 삭제되면 같이 삭제 됨
+    @JoinColumn(name = "book_id", referencedColumnName = "id")
+    private Book book;
+
+
+    public RentalEBookDto toDto() {
         Duration duration=Duration.between(LocalDateTime.now(), expirationDateTime);
         long remainingDays=duration.toDays();
         long remainingHours=duration.toHours()%24;
         long remainingMinutes=duration.toMinutes()%60;
 
-        return RentalBookDto.builder()
-                .memberId(entity.getId())
-                .bookId(entity.getId())
+        return RentalEBookDto.builder()
+                .memberId(memberId)
+                .bookId(book.getId())
                 .rentalId(this.id)
+                .imageName(book.getImageName())
                 .rentalStartDate(this.createAt)
                 .rentalEndDate(this.expirationDateTime)
                 .remainingDay(remainingDays)
@@ -66,21 +66,24 @@ public class RentalEbook {
                 .remainingMinutes(remainingMinutes).build();
     }
 
-    public AllBooksInfoDto toInfoDto(RentalEbook entity) {
+    public AllBooksInfoDto toInfoDto() {
         Duration duration=Duration.between(LocalDateTime.now(), expirationDateTime);
         long remainingDays=duration.toDays();
         long remainingHours=duration.toHours()%24;
         long remainingMinutes=duration.toMinutes()%60;
 
         return AllBooksInfoDto.builder()
-                .bookId(entity.getBookId())
-                .buyDate(entity.getCreateAt().format( DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                .expiryDate(entity.getExpirationDateTime().format(  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .bookId(book.getId())
+                .imageName(book.getImageName())
+                .bookName(book.getBookName())
+                .buyDate(createAt.format( DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .expiryDate(expirationDateTime.format(  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .remainingDays(remainingDays)
                 .remainingHours(remainingHours)
                 .remainingMinutes(remainingMinutes)
                 .remainingStatus(LocalDateTime.now().compareTo(expirationDateTime)) // 조회날짜 - 만료날짜
                 .buyBuyOptions("전자책 대여")
-                .totalPrice(entity.getTotalPrice()).build();
+                .totalPrice(totalPrice).build();
     }
+
 }

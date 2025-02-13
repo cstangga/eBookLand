@@ -37,32 +37,35 @@ public class BuyPaperBook {
     @Column(name = "member_id")
     private long memberId;
 
-    @Column(name = "book_id")
-    private long bookId;
-
     @Column(name = "total_price")
     private long totalPrice;
 
     @Column(name = "total_amount")
     private int totalAmount;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE) // BookEntity과 삭제되면 같이 삭제 됨
+    @JoinColumn(name = "book_id", referencedColumnName = "id")
+    private Book book;
+
     @Version
     private long version;
 
-    public BuyPaperBookDto toDto(BuyPaperBook entity) {
+    public BuyPaperBookDto toDto() {
         return BuyPaperBookDto.builder()
-                .bookId(entity.bookId)
-                .memberId(entity.memberId)
-                .totalAmount(entity.totalAmount)
-                .totalPrice(entity.totalPrice).build();
+                .bookId(book.getId())
+                .memberId(memberId)
+                .totalAmount(totalAmount)
+                .totalPrice(totalPrice).build();
     }
 
-    public AllBooksInfoDto toInfoDto(BuyPaperBook entity) {
+    public AllBooksInfoDto toInfoDto() {
         return AllBooksInfoDto.builder()
-                .bookId(entity.getBookId())
+                .bookId(book.getId())
                 .buyBuyOptions("종이책 구매")
-                .buyDate(entity.getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                .totalAmount(entity.getTotalAmount())
-                .totalPrice(entity.getTotalPrice()).build();
+                .buyDate(createAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .imageName(book.getImageName())
+                .bookName(book.getBookName())
+                .totalAmount(totalAmount)
+                .totalPrice(totalPrice).build();
     }
 }

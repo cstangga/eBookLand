@@ -1,13 +1,8 @@
 package com.cstangga.ebookland.bookboard.service;
 
 
-import com.cstangga.ebookland.bookboard.dto.AllBooksInfoDto;
-import com.cstangga.ebookland.bookboard.dto.BookListDto;
-import com.cstangga.ebookland.bookboard.dto.BookModifyDto;
-import com.cstangga.ebookland.bookboard.entity.Book;
-import com.cstangga.ebookland.bookboard.entity.BuyEbook;
-import com.cstangga.ebookland.bookboard.entity.BuyPaperBook;
-import com.cstangga.ebookland.bookboard.entity.RentalEbook;
+import com.cstangga.ebookland.bookboard.dto.*;
+import com.cstangga.ebookland.bookboard.entity.*;
 import com.cstangga.ebookland.bookboard.repository.BookRepository;
 import com.cstangga.ebookland.bookboard.repository.BuyEbookRepository;
 import com.cstangga.ebookland.bookboard.repository.BuyPaperBookRepository;
@@ -124,57 +119,49 @@ public class BookService {
         bookRepository.deleteById(bookId);
     }
 
-    public List<BookListDto> searchBook(String type, String word) {
+    public List<BookDtoList> searchBook(String type, String word) {
         log.info("BookService searchBook");
-        List<BookListDto> bookListDto = new ArrayList<>();
+        List<BookDtoList> bookDtoList = new ArrayList<>();
         if(type.equals("bookName"))
         {
             List<Book> booksEntity =bookRepository.findBookByBookNameContaining(word);
             for(Book book:booksEntity)
             {
-                bookListDto.add(new BookListDto().entityToDto(book));
+                bookDtoList.add(new BookDtoList().entityToDto(book));
             }
         }
         else{
             List<Book> booksEntity = bookRepository.findBookByAuthorNameContaining(word);
             for(Book book:booksEntity)
             {
-                bookListDto.add(new BookListDto().entityToDto(book));
+                bookDtoList.add(new BookDtoList().entityToDto(book));
             }
         }
-        return bookListDto;
+        return bookDtoList;
     }
 
-    public List<AllBooksInfoDto> findAllBook(long id)
+    public List<AllBooksInfoDto> findAllBook(long id) // 마이페이지에 필요한 메소드
     {
         log.info("bookService findAllBook");
         List<AllBooksInfoDto> allBooksInfoDtoList = new ArrayList<>();
         for(BuyPaperBook entity : buyPaperBookRepository.findAllByMemberId(id))
         {
-            Book book = bookRepository.findBookById(entity.getBookId());
-            AllBooksInfoDto dto = entity.toInfoDto(entity);
-            dto.setBookName(book.getBookName());
-            dto.setImageName(book.getImageName());
+            AllBooksInfoDto dto = entity.toInfoDto();
             allBooksInfoDtoList.add(dto);
         }
 
         for(BuyEbook entity : buyEbookRepository.findAllByMemberId(id))
         {
-            Book book = bookRepository.findBookById(entity.getBookId());
-            AllBooksInfoDto dto = entity.toInfoDto(entity);
-            dto.setBookName(book.getBookName());
-            dto.setImageName(book.getImageName());
+            AllBooksInfoDto dto = entity.toInfoDto();
             allBooksInfoDtoList.add(dto);
         }
 
         for(RentalEbook entity : rentalBookRepository.findAllByMemberId(id))
         {
-            Book book = bookRepository.findBookById(entity.getBookId());
-            AllBooksInfoDto dto = entity.toInfoDto(entity);
-            dto.setBookName(book.getBookName());
-            dto.setImageName(book.getImageName());
+            AllBooksInfoDto dto = entity.toInfoDto();
             allBooksInfoDtoList.add(dto);
         }
         return allBooksInfoDtoList;
     }
+
 }

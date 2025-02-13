@@ -1,6 +1,7 @@
 package com.cstangga.ebookland.bookboard.dto;
 
 
+import com.cstangga.ebookland.bookboard.entity.Book;
 import com.cstangga.ebookland.bookboard.entity.BuyEbook;
 import com.cstangga.ebookland.bookboard.entity.BuyPaperBook;
 import lombok.AllArgsConstructor;
@@ -18,10 +19,10 @@ public class BuyPaperBookDto {
     private long totalPrice;
     private int totalAmount;
 
-    public BuyPaperBook dtoToPaperBookEntity()
+    public BuyPaperBook dtoToPaperBookEntity(Book book)
     {
         return BuyPaperBook.builder()
-                .bookId(bookId)
+                .book(book)
                 .memberId(memberId)
                 .totalPrice(totalPrice)
                 .totalAmount(totalAmount).build();

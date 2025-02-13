@@ -1,7 +1,6 @@
 package com.cstangga.ebookland.bookboard.service;
 
-import com.cstangga.ebookland.bookboard.dto.AllBooksInfoDto;
-import com.cstangga.ebookland.bookboard.dto.RentalBookDto;
+import com.cstangga.ebookland.bookboard.dto.RentalEBookDto;
 import com.cstangga.ebookland.bookboard.entity.Book;
 import com.cstangga.ebookland.bookboard.entity.RentalEbook;
 import com.cstangga.ebookland.bookboard.repository.BookRepository;
@@ -20,32 +19,34 @@ public class RentalEBookService {
     private final RentalBookRepository rentalBookRepository;
     private final BookRepository bookRepository;
 
-    public void rentalBook(RentalBookDto dto) {
+    public void rentalBook(RentalEBookDto dto) {
         log.info("BookService rentalBook");
-        RentalEbook entity = dto.dtoToRentalEbook();
+        Book book=bookRepository.findBookById(dto.getBookId());
+        RentalEbook entity = dto.dtoToRentalEbookEntity(book);
         entity=rentalBookRepository.save(entity);
         log.info("entity = {}",entity);
         log.info("대여 시작 날짜 = {}",entity.getCreateAt());
         log.info("대여 종료 날짜 = {}",entity.getExpirationDateTime());
     }
 
-    public List<RentalBookDto> findAllRentalEbookById(Long id) {
-        // 회원이 대여한 책 정보를 가져온다
+    public List<RentalEBookDto> findAllRentalEbookById(Long id) {
+        // fetch join 써야 함
+        // 회원이 대여한 모든 책 정보를 가져온다
         log.info("BookService findRentalEbookById");
 
         List<RentalEbook> rentalEbooks=rentalBookRepository.findAllByMemberId(id);
-        List<RentalBookDto> rentalBookDtoList=new ArrayList<>();
+        List<RentalEBookDto> rentalEBookDtoList =new ArrayList<>();
 
         for(RentalEbook entity:rentalEbooks){
 
-            Book bookEntity=bookRepository.findBookById(entity.getBookId());
-            RentalBookDto rentalBookDto=entity.toDto(bookEntity);
-            rentalBookDtoList.add(rentalBookDto);
+            Book bookEntity=bookRepository.findBookById(entity.getBook().getId());
+            RentalEBookDto rentalEBookDto =entity.toDto();
+            rentalEBookDtoList.add(rentalEBookDto);
             log.info("bookEntity = {}",bookEntity);
-            log.info("rentalBookDto = {}",rentalBookDto);
+            log.info("rentalBookDto = {}", rentalEBookDto);
         }
 
-        return rentalBookDtoList;
+        return rentalEBookDtoList;
     }
 
 }

@@ -1,7 +1,7 @@
 package com.cstangga.ebookland.bookboard.controller;
 
 
-import com.cstangga.ebookland.bookboard.dto.RentalBookDto;
+import com.cstangga.ebookland.bookboard.dto.RentalEBookDto;
 import com.cstangga.ebookland.bookboard.service.RentalEBookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ public class RentalEBookController {
 
     @PostMapping("/rentalEbook")
     @ResponseBody
-    public String rentalEbook(@ModelAttribute RentalBookDto dto)
+    public String rentalEbook(@ModelAttribute RentalEBookDto dto)
     {
         log.info("POST /bookboard/rentalEbook");
         log.info("dto = {}",dto);
