@@ -14,4 +14,6 @@ public interface RentalBookRepository extends JpaRepository<RentalEbook, String 
     // OneToMany(One=RentalEBook, Many=Book)
     @Query(value = "select re from RentalEbook re join fetch re.book where re.memberId=:memberId")
     List<RentalEbook> findAllByMemberId(@Param("memberId")long memberId);
+
+    RentalEbook findRentalEbookByBookId(long id);
 }

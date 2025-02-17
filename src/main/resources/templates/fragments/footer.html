@@ -8,27 +8,27 @@
     <title>Footer with Modal</title>
 
     <style>
-
+        .container {
+            margin-top: 50px; /* 메인과의 간격 */
+            border-top: 1px solid #ddd; /* 위쪽 경계선 추가 */
+            padding: 20px;
+            text-align: center;
+            background-color: #f8f9fa; /* 배경색 추가 */
+        }
     </style>
 </head>
 <body>
 <footer th:fragment="footerFragment" class="footer">
     <div class="container">
         <div class="row">
-
             <div class="footer-content">
-                <p>주식회사 펫토피아 | 대표 : 최창준 | 개인정보책임관리자 : 홍윤영 | 사업자등록번호: 123-48-06212 | 통신판매업신고번호: 제 2024-서울강남-7349 호</p>
-                <p>서울시 강남구 삼성로 44, 3층(삼성동, 도도독케어센터)</p>
-                <p>© 2024 PetTopia. All Rights Reserved.</p>
+                <p>© 2025 EBookLand. All Rights Reserved.</p>
             </div>
             <div class="footer-links">
                 <strong>
                     <a id="terms-link" data-bs-toggle="modal" data-bs-target="#termsModal">이용약관</a> |
-                    <a id="privacy-link" data-bs-toggle="modal" data-bs-target="#privacyModal">개인정보처리방침</a> |
-                    <a id="location-link" data-bs-toggle="modal" data-bs-target="#locationModal">위치기반서비스 이용약관</a> |
-                </strong>
+                    <a id="privacy-link" data-bs-toggle="modal" data-bs-target="#privacyModal">개인정보처리방침</a> |</strong>
             </div>
-
         </div>
     </div>
 </footer>

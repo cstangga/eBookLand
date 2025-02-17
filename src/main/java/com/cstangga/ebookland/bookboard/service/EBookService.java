@@ -37,4 +37,9 @@ public class EBookService {
         return buyEBookDtoList;
     }
 
+    public BuyEBookDto findEBookByBookId(long bookId) {
+        log.info("BookService findEBookByBookId");
+        BuyEbook entity=buyEbookRepository.findBuyEbookByBookId(bookId);
+        return entity.toDto();
+    }
 }

@@ -11,20 +11,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BookDtoList {
+public class BookDto {
     private long bookId;
     private String bookName;
     private String author;
     private String publisher;
     private String imageName;
+    private String bookDetails;
 
-    public BookDtoList entityToDto(Book entity) {
-        return BookDtoList.builder()
+    public BookDto entityToDto(Book entity) {
+        return BookDto.builder()
                 .bookId(entity.getId())
                 .bookName(entity.getBookName())
                 .author(entity.getAuthorName())
                 .publisher(entity.getPublisherName())
                 .imageName(entity.getImageName())
+                .bookDetails(entity.getBookDetails())
                 .build();
     }
 }

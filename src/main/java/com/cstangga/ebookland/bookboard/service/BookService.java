@@ -119,22 +119,22 @@ public class BookService {
         bookRepository.deleteById(bookId);
     }
 
-    public List<BookDtoList> searchBook(String type, String word) {
+    public List<BookDto> searchBook(String type, String word) {
         log.info("BookService searchBook");
-        List<BookDtoList> bookDtoList = new ArrayList<>();
+        List<BookDto> bookDtoList = new ArrayList<>();
         if(type.equals("bookName"))
         {
             List<Book> booksEntity =bookRepository.findBookByBookNameContaining(word);
             for(Book book:booksEntity)
             {
-                bookDtoList.add(new BookDtoList().entityToDto(book));
+                bookDtoList.add(new BookDto().entityToDto(book));
             }
         }
         else{
             List<Book> booksEntity = bookRepository.findBookByAuthorNameContaining(word);
             for(Book book:booksEntity)
             {
-                bookDtoList.add(new BookDtoList().entityToDto(book));
+                bookDtoList.add(new BookDto().entityToDto(book));
             }
         }
         return bookDtoList;

@@ -25,10 +25,14 @@ public class RentalEBookDto {
     private String bookName;
     private LocalDateTime rentalStartDate;
     private LocalDateTime rentalEndDate;
-    private long remainingDay; // 며칠 남았는지
+    private long remainingDays; // 며칠 남았는지
     private long remainingHours; // 몇시간 남았는지
     private long remainingMinutes; // 몇시간 남았는지
     private String imageName;
+    private long remainingStatus; // 반납까지 남은 시간
+    private Book book;
+    private String details;
+    private String buyOption;
 
 
     public RentalEbook dtoToRentalEbookEntity(Book book) {

@@ -1,8 +1,8 @@
 package com.cstangga.ebookland.bookboard.controller;
 
-import com.cstangga.ebookland.auth.principal.AuthPrincipal;
 import com.cstangga.ebookland.bookboard.dto.*;
 import com.cstangga.ebookland.bookboard.entity.Book;
+import com.cstangga.ebookland.bookboard.repository.BuyEbookRepository;
 import com.cstangga.ebookland.bookboard.service.BookService;
 
 import com.cstangga.ebookland.bookboard.service.EBookService;
@@ -11,7 +11,6 @@ import com.cstangga.ebookland.bookboard.service.RentalEBookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,13 +29,14 @@ public class BookController {
     private final PaperBookService paperBookService;
     private final RentalEBookService rentalEBookService;
     private final EBookService ebookService;
+    private final BuyEbookRepository buyEbookRepository;
 
     @GetMapping("/list")
     public void list(Model model) {
         List<Book> books = bookService.findAll();
-        List<BookDtoList> bookDtoList = new ArrayList<>();
+        List<BookDto> bookDtoList = new ArrayList<>();
         for (Book book : books) {
-            bookDtoList.add(new BookDtoList().entityToDto(book));
+            bookDtoList.add(new BookDto().entityToDto(book));
         }
         model.addAttribute("bookDtoList", bookDtoList);
     }
@@ -115,7 +115,7 @@ public class BookController {
         log.info("word = {}",word);
         log.info("type = {}",type);
 
-        List<BookDtoList> bookDtoList=bookService.searchBook(type,word);
+        List<BookDto> bookDtoList=bookService.searchBook(type,word);
 
         log.info("bookDtoList = {}",bookDtoList);
 
@@ -128,5 +128,17 @@ public class BookController {
     private void modifybook(){
         log.info("GET /bookboard/modifybook");
     }
+
+
+    @GetMapping("/readBuyEBook/{bookId}")
+    public String readBook(@PathVariable("bookId")long bookId,Model model)
+    {
+        log.info("GET /bookboard/readbook/{}",bookId);
+        BuyEBookDto eBookDto=ebookService.findEBookByBookId(bookId);
+        model.addAttribute("dto",eBookDto);
+        return "/bookboard/readbook";
+    }
+
+
 
 }

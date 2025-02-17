@@ -49,8 +49,11 @@ public class BuyEbook {
         return BuyEBookDto.builder()
                 .bookId(book.getId())
                 .imageName(book.getImageName())
+                .bookName(book.getBookName())
                 .memberId(memberId)
                 .totalPrice(totalPrice)
+                .buyOption("전자책 구매")
+                .details(book.getBookDetails())
                 .buyDate(createAt).build();
     }
 

@@ -16,4 +16,6 @@ public interface BuyEbookRepository extends JpaRepository<BuyEbook, String > {
 
     @Query(value = "select be from BuyEbook be join fetch be.book where be.memberId=:memberId")
     List<BuyEbook> findAllByMemberId(@Param("memberId")long id);
+
+    BuyEbook findBuyEbookByBookId(long bookId);
 }

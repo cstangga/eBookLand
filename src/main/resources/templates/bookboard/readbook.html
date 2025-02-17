@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>책 읽기</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .book-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%; /* 전체 너비 */
+            margin-top: 20px;
+        }
+        .book-header .content-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 800px; /* 원하는 최대 너비 */
+            width: 100%;
+        }
+        .book-cover {
+            max-width: 150px;
+            height: auto;
+        }
+        .book-details {
+            padding-left: 20px;
+            text-align: left;
+        }
+        .book-content {
+            margin-top: 20px;
+            height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+<div class="container" layout:fragment="main">
+    <!-- 중앙 정렬을 위한 book-header -->
+    <div class="book-header">
+        <div class="content-wrapper">
+            <img th:src="@{/bookImage/{imageName}(imageName=${dto.imageName})}" alt="책 표지" class="book-cover">
+            <div class="book-details">
+                <h1 th:text="${dto.bookName}"></h1>
+                <p th:if="${dto.buyOption.equals('전자책 대여')}" th:text="|남은 기간: ${dto.remainingDays}일 ${dto.remainingHours}시간 ${dto.remainingMinutes}분|"></p>
+            </div>
+        </div>
+    </div>
+    <!-- 책 내용 -->
+    <div class="book-content" th:text="${dto.details}">
+        <!-- 책의 내용이 여기에 표시됩니다. -->
+    </div>
+</div>
+</body>
+</html>

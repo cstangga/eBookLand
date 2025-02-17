@@ -43,7 +43,7 @@ public class RentalEbook {
     @Column(name = "Expiration_date_time")
     private LocalDateTime expirationDateTime;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE) // BookEntity과 삭제되면 같이 삭제 됨
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE) // BookEntity 와 삭제되면 같이 삭제 됨
     @JoinColumn(name = "book_id", referencedColumnName = "id")
     private Book book;
 
@@ -58,10 +58,14 @@ public class RentalEbook {
                 .memberId(memberId)
                 .bookId(book.getId())
                 .rentalId(this.id)
+                .bookName(book.getBookName())
                 .imageName(book.getImageName())
+                .details(book.getBookDetails())
+                .buyOption("전자책 대여")
                 .rentalStartDate(this.createAt)
                 .rentalEndDate(this.expirationDateTime)
-                .remainingDay(remainingDays)
+                .remainingStatus(LocalDateTime.now().compareTo(expirationDateTime)) // 조회날짜 - 만료날짜
+                .remainingDays(remainingDays)
                 .remainingHours(remainingHours)
                 .remainingMinutes(remainingMinutes).build();
     }

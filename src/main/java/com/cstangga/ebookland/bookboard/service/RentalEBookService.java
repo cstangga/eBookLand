@@ -49,4 +49,11 @@ public class RentalEBookService {
         return rentalEBookDtoList;
     }
 
+    public RentalEBookDto findRentalEbookByBookId(Long id) {
+        log.info("BookService findRentalEbookById");
+        RentalEbook entity=rentalBookRepository.findRentalEbookByBookId(id);
+        log.info("entity = {}",entity);
+        return entity.toDto();
+    }
+
 }
