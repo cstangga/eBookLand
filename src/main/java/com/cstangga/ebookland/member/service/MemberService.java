@@ -29,7 +29,7 @@ public class MemberService {
             throw new RuntimeException(e);
         }
 
-        Member member =new Member().dtoToEntity(dto);
+        Member member =dto.toEntity();
         log.info("member = {}", member);
         member.setDefaultAuthorities();
 
@@ -42,12 +42,7 @@ public class MemberService {
         log.info("dto = {}", dto);
         Member member=memberRepository.findMemberById(dto.getMemberId());
         log.info("member = {}", member);
-        member.setName(dto.getMemberName());
-        member.setPhoneNumber(dto.getMemberPhone());
-        member.setAddress(dto.getAddress());
-        member.setPostCode(dto.getPostCode());
-        member.setExtraAddress(dto.getExtraAddress());
-        member.setDetailAddress(dto.getDetailAddress());
+        member.update(dto);
         memberRepository.save(member);
         return dto;
     }
@@ -61,7 +56,7 @@ public class MemberService {
         log.info("MemberService /findMemberByEmail");
         Member member = memberRepository.findMemberByEmail(email);
         MemberDto memberDto = new MemberDto();
-        memberDto=memberDto.entityToDto(member);
+        memberDto=memberDto.dtoToEntity();
         log.info("Member = {}", member);
         log.info("MemberDto = {}", memberDto);
         return memberDto;

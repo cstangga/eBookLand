@@ -1,5 +1,6 @@
 package com.cstangga.ebookland.member.entity;
 
+import com.cstangga.ebookland.member.dto.MemberDto;
 import com.cstangga.ebookland.member.dto.ProfileUpdateRequestDto;
 import com.cstangga.ebookland.member.dto.SignupDto;
 import jakarta.persistence.*;
@@ -38,6 +39,9 @@ Member {
 
     @Column(name="email")
     private String email;
+
+    @Column(name = "nickName")
+    private String nickName;
 
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -83,31 +87,27 @@ Member {
         this.authorities = Set.of(Authority.ROLE_MEMBER);
     }
 
-    public void updateProfile(ProfileUpdateRequestDto dto)
-    {
-        this.phoneNumber=dto.getPhoneNumber();
-        this.password=dto.getPassword();
-        this.email=dto.getEmail();
-        this.name=dto.getName();
-        this.postCode=dto.getPostCode();
-        this.address=dto.getAddress();
-        this.detailAddress=dto.getAddress();
-
+    public MemberDto toDto() {
+        return MemberDto.builder()
+                .memberId(id)
+                .memberName(name)
+                .nickName(nickName)
+                .memberPhone(phoneNumber)
+                .address(address)
+                .extraAddress(extraAddress)
+                .detailAddress(detailAddress)
+                .postCode(postCode)
+                .build();
     }
 
-    public Member dtoToEntity(SignupDto dto)
+    public void update(MemberDto dto)
     {
-        return Member.builder()
-                .email(dto.getEmail())
-                .phoneNumber(dto.getPhoneNumber())
-                .name(dto.getName())
-                .password(dto.getPassword())
-                .address(dto.getAddress())
-                .postCode(dto.getPostCode())
-                .detailAddress(dto.getDetailAddress())
-                .gender(dto.getGender())
-                .extraAddress(dto.getExtraAddress())
-                .birth(dto.getBirth())
-                .build();
+        name=dto.getMemberName();
+        phoneNumber=dto.getMemberPhone();
+        nickName=dto.getNickName();
+        address=dto.getAddress();
+        postCode=dto.getPostCode();
+        extraAddress=dto.getExtraAddress();
+        detailAddress=dto.getDetailAddress();
     }
 }

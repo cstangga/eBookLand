@@ -39,13 +39,13 @@ public class WebSecurityConfig {
                     registry
 
                             // 누구나 허용
-                            .requestMatchers("/", "/index.html","/auth/login","/member/**").permitAll()
+                            .requestMatchers("/", "/index.html","/auth/login","/member/**","/freeboard/list").permitAll()
 
                             // 로그인 안 한 사용자에게 허용되는 페이지
                             .requestMatchers( "/auth/login","/bookboard/","/noticeboard/").anonymous()
 
                             // 인증된 사용자만 허용 - 로그인 한 사용자를 의미함
-                            .requestMatchers("/noticeboard/**","/bookboard/**","/member/mypage").authenticated()
+                            .requestMatchers("/noticeboard/**","/bookboard/**","/member/mypage","/freeboard/detail/").authenticated()
 
                             // ROLE_ADMIN 권한이 있는 사용자만 허용
                             .requestMatchers("/admin/**","/noticeboard/**","/bookboard/**","/noticeboard/**").hasRole("ADMIN")

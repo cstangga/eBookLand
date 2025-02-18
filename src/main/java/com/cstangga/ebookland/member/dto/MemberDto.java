@@ -1,6 +1,5 @@
 package com.cstangga.ebookland.member.dto;
 
-import com.cstangga.ebookland.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,15 +17,17 @@ public class MemberDto {
     private String postCode;
     private String detailAddress;
     private String extraAddress;
-    public MemberDto entityToDto(Member entity) {
+    private String nickName;
+    public MemberDto dtoToEntity() {
         return MemberDto.builder()
-                .memberId(entity.getId())
-                .memberName(entity.getName())
-                .address(entity.getAddress())
-                .detailAddress(entity.getDetailAddress())
-                .postCode(entity.getPostCode())
-                .extraAddress(entity.getExtraAddress())
-                .memberPhone(entity.getPhoneNumber())
+                .memberId(memberId)
+                .memberName(memberName)
+                .address(address)
+                .detailAddress(detailAddress)
+                .postCode(postCode)
+                .extraAddress(extraAddress)
+                .memberPhone(memberPhone)
+                .nickName(nickName)
                 .build();
     }
 }

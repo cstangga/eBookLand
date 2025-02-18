@@ -27,5 +27,21 @@ public class SignupDto {
     private String detailAddress;
     private String extraAddress;
     private LocalDate birth;
+    private String nickName;
 
+    public Member toEntity() {
+        return Member.builder()
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .name(name)
+                .nickName(nickName)
+                .password(password)
+                .address(address)
+                .postCode(postCode)
+                .detailAddress(detailAddress)
+                .gender(gender)
+                .extraAddress(extraAddress)
+                .birth(birth)
+                .build();
+    }
 }
