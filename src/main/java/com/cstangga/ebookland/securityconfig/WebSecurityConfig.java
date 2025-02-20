@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -39,20 +40,20 @@ public class WebSecurityConfig {
                     registry
 
                             // 누구나 허용
-                            .requestMatchers("/", "/index.html","/auth/login","/member/**","/freeboard/list").permitAll()
+                            .requestMatchers("/", "/index.html","/auth/login","/member/**","/freeboard/list","/ws/chat/**","/chat/**").permitAll()
 
                             // 로그인 안 한 사용자에게 허용되는 페이지
-                            .requestMatchers( "/auth/login","/bookboard/","/noticeboard/").anonymous()
+                            .requestMatchers( "/auth/login","/bookboard/","/noticeboard/","/ws/chat/**","/chat/**").anonymous()
 
                             // 인증된 사용자만 허용 - 로그인 한 사용자를 의미함
-                            .requestMatchers("/noticeboard/**","/bookboard/**","/member/mypage","/freeboard/detail/").authenticated()
+                            .requestMatchers("/noticeboard/**","/bookboard/**","/member/mypage","/freeboard/detail/","/ws/chat/**","/chat/**").authenticated()
 
                             // ROLE_ADMIN 권한이 있는 사용자만 허용
-                            .requestMatchers("/admin/**","/noticeboard/**","/bookboard/**","/noticeboard/**").hasRole("ADMIN")
+                            .requestMatchers("/admin/**","/noticeboard/**","/bookboard/**","/noticeboard/**","/ws/chat/**","/chat/**").hasRole("ADMIN")
 
                             // 나머지들은 이렇게 해주세요~
                             .anyRequest().authenticated();
-                }); // 람다로 작성하게 되어있음
+                }).headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)); // 람다로 작성하게 되어있음
 
         /**
          * 폼 로그인 설정
