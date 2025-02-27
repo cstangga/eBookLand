@@ -1,16 +1,7 @@
 package com.cstangga.ebookland.websocket;
 
-import com.cstangga.ebookland.chat.ChatRoom;
-import com.cstangga.ebookland.chat.dto.ChatMessage;
-import com.cstangga.ebookland.chat.service.ChatService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
-
+/**
+ * stomp의 pub/sub 사용하기 때문에 메세지를 다루는 핸들러는 없어도 된다.
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -24,7 +15,8 @@ public class WebSocketChatHandler extends TextWebSocketHandler {
         String payload = message.getPayload(); // json형식으로 보여준다
         log.info("payload {}", payload);
         ChatMessage chatMessage=objectMapper.readValue(payload, ChatMessage.class);
-        ChatRoom chatRoom=chatService.findRoomById(chatMessage.getRoomId());
-        chatRoom.handleActions(session,chatMessage,chatService);
+        ChatRoomDto chatRoomDto =chatService.findRoomById(chatMessage.getRoomId());
+        chatRoomDto.handleActions(session,chatMessage,chatService);
     }
 }
+ **/

@@ -40,6 +40,7 @@ dependencies {
     // 채팅
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.0.0'
 }

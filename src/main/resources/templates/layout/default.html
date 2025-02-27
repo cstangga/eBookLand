@@ -7,6 +7,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title layout:title-pattern="$LAYOUT_TITLE | $CONTENT_TITLE">eBookLand</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
     <link rel="stylesheet" th:href="@{/css/chat/chat.css}">
 
 </head>
@@ -28,7 +31,7 @@
 <div class="chat-window" id="chatWindow">
     <div class="chat-header" onclick="toggleChat()">1:1 채팅</div>
     <div class="chat-body" id="chatBody">
-        <h3>여기에 메세지가 들어간다.</h3>
+
     </div>
     <div class="chat-input">
         <input type="text" id="chatMessage" placeholder="메시지를 입력하세요...">
@@ -43,8 +46,77 @@
     }
 </script>
 
+<script>
+    var stompClient = null;
+    var roomId = "1"; // 예제 채팅방 ID
+    var nickName;
+
+    // 로그인한 사용자의 roomId 가져오기
+    fetch('/member/api/member/roomId')
+        .then(response => {
+            if (response.redirected) {
+                console.log("Redirected to login page. User is not authenticated.");
+                window.location.href = response.url; // Redirect user to login
+                return Promise.reject("로그인 안함");
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data !== "0") {
+                roomId = data.roomId;
+                nickName = data.nickName;
+                console.log("roomId = "+data.roomId,"nickName = "+data.nickName);
+                connectWebSocket();
+            }
+        })
+        .catch(error => console.log("Fetch error: ", error));
+
+    function connectWebSocket() {
+        var socket = new SockJS("/ws-stomp");
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+            console.log("커넥티드: " + frame);
+
+            // 올바른 주소로 구독
+            stompClient.subscribe("/sub/chat/room/" + roomId, function (message) {
+                console.log("message = ",message, "웹소켓 커넥션 완료");
+                var receivedMessage = JSON.parse(message.body);
+                displayMessage(receivedMessage);
+            });
+        });
+    }
+
+    function sendMessage() {
+        var messageInput = document.getElementById("chatMessage").value.trim();
+        if (!messageInput) return; // 입력이 없으면 전송하지 않음
+
+        if (stompClient && stompClient.connected) {
+            var chatMessage = {
+                roomId: roomId,
+                sender: nickName,
+                message: messageInput
+            };
+
+            stompClient.send("/pub/message", {}, JSON.stringify(chatMessage));
+            document.getElementById("chatMessage").value = "";
+        }
+    }
+
+    function displayMessage(message) {
+        var chatBody = document.getElementById("chatBody");
+        var messageElement = document.createElement("div");
+        messageElement.textContent = message.sender + ": " + message.message;
+        chatBody.appendChild(messageElement);
+    }
+
+    window.onload = function () {
+        connectWebSocket();
+    };
+</script>
+
 
 <!-- 스크립트 부분 -->
 <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+
 </body>
 </html>

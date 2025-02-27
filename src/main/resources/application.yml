@@ -1,4 +1,8 @@
 spring:
+  websocket:
+    enableded:true
+
+
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html

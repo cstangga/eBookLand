@@ -40,7 +40,7 @@ public class WebSecurityConfig {
                     registry
 
                             // 누구나 허용
-                            .requestMatchers("/", "/index.html","/auth/login","/member/**","/freeboard/list","/ws/chat/**","/chat/**").permitAll()
+                            .requestMatchers("/", "/index.html","/auth/login","/member/**","/freeboard/list","/ws/chat/**","/chat/**","/member/api/member/roomId","/ws-stomp/**").permitAll()
 
                             // 로그인 안 한 사용자에게 허용되는 페이지
                             .requestMatchers( "/auth/login","/bookboard/","/noticeboard/","/ws/chat/**","/chat/**").anonymous()

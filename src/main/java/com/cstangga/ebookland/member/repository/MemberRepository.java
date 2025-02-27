@@ -1,5 +1,6 @@
 package com.cstangga.ebookland.member.repository;
 
+import com.cstangga.ebookland.chat.entity.ChatRoom;
 import com.cstangga.ebookland.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

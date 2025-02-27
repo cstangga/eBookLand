@@ -73,6 +73,9 @@ Member {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    @Column(name = "room_id")
+    private long roomId;
+
 
     // 회원 역할 - 최대 2개를 가질 수 있음.
     @Enumerated(EnumType.STRING) // enum을 string으로 관리

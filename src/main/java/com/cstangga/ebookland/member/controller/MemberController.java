@@ -9,19 +9,27 @@ import com.cstangga.ebookland.bookboard.service.BookService;
 import com.cstangga.ebookland.bookboard.service.EBookService;
 import com.cstangga.ebookland.bookboard.service.PaperBookService;
 import com.cstangga.ebookland.bookboard.service.RentalEBookService;
+import com.cstangga.ebookland.chat.entity.ChatRoom;
+import com.cstangga.ebookland.chat.service.ChatService;
 import com.cstangga.ebookland.member.dto.MemberDto;
 import com.cstangga.ebookland.member.dto.SignupDto;
 import com.cstangga.ebookland.member.entity.Member;
 import com.cstangga.ebookland.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.sound.midi.MetaMessage;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -29,13 +37,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
-    private final PasswordEncoder passwordEncoder;
     private final RentalEBookService rentalEBookService;
     private final EBookService eBookService;
-    private final PaperBookService paperBookService;
     private final BookService bookService;
-    private final BuyPaperBookRepository buyPaperBookRepository;
-    private final BuyEbookRepository buyEbookRepository;
+    private final ChatService chatService;
+    private final ConversionService conversionService;
+
 
     @GetMapping("/signup")
     public void signup(){
@@ -56,7 +63,10 @@ public class MemberController {
     {
         log.info("POST /member/registerMember");
         Member member=memberService.memberSave(dto);
-        log.debug("member = {}", member);
+        ChatRoom entity=chatService.createRoom(member);
+        log.info("memberEntity = {}", member);
+        log.info("chatRoomEntity = {}", entity);
+
         return "redirect:/";
     }
 
@@ -120,6 +130,19 @@ public class MemberController {
         model.addAttribute("buyEBookDtoList",buyEBookDtoList);
     }
 
+    @GetMapping("/api/member/roomId")
+    @ResponseBody  // ✅ This makes the method return raw data (not an HTML view)
+    public ResponseEntity<?> getUserRoomId(@AuthenticationPrincipal AuthPrincipal member) {
+        log.info("GET /api/member/roomId");
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
 
+        Map<String, Object> memberInfo = new HashMap<>();
+        memberInfo.put("roomId", member.getMember().getRoomId());
+        memberInfo.put("nickName", member.getMember().getNickName());
+        log.info("memberInfo = {}", memberInfo);
+        return ResponseEntity.ok(memberInfo);
+    }
 
 }

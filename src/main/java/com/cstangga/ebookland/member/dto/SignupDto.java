@@ -28,6 +28,7 @@ public class SignupDto {
     private String extraAddress;
     private LocalDate birth;
     private String nickName;
+    private long roomId;
 
     public Member toEntity() {
         return Member.builder()
@@ -42,6 +43,7 @@ public class SignupDto {
                 .gender(gender)
                 .extraAddress(extraAddress)
                 .birth(birth)
+                .roomId(roomId)
                 .build();
     }
 }
