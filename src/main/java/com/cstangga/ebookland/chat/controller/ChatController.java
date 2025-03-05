@@ -24,7 +24,9 @@ public class ChatController {
     @MessageMapping("/message")
     public void sendMessage(@ModelAttribute ChatMessageDto dto)
     {
+        log.info("MessageMapping /message");
         log.info("dto = {}",dto);
+        dto.setReadCheck(false);
         chatService.sendMessage(dto);
     }
 

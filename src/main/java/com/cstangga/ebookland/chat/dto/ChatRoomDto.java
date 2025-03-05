@@ -20,6 +20,8 @@ public class ChatRoomDto {
     private String roomName; // 방 제목인데, 1:1 채팅이니 "홍길동"님 과의 채팅 이렇게 하자
     private Member member;
     private Member admin;
+    private ChatMessageDto chatMessage;
+
 
     public ChatRoom toEntity() {
         return ChatRoom.builder()

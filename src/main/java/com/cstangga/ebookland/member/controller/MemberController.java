@@ -134,6 +134,7 @@ public class MemberController {
     @ResponseBody  // ✅ This makes the method return raw data (not an HTML view)
     public ResponseEntity<?> getUserRoomId(@AuthenticationPrincipal AuthPrincipal member) {
         log.info("GET /api/member/roomId");
+        log.info("member = {}", member);
         if (member == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }

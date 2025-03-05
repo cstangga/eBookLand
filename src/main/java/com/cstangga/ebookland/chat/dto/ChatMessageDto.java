@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Builder
 @AllArgsConstructor
@@ -19,5 +20,6 @@ public class ChatMessageDto {
     private long roomId; // 방번호
     private String sender; // 메시지 보낸사람
     private String message; // 메시지
-    private String  createdAt;
+    private String  createdAt = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME); // 보낸 시간
+    private boolean readCheck; // 읽음 처리
 }
