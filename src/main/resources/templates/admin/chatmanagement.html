@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html class="admin-page" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/default}">
 <head>
@@ -9,6 +9,7 @@
     <title>채팅 관리</title>
     <link rel="stylesheet" th:href="@{/css/chat/chat.css}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="/js/websocket.js"></script> <!-- ✅ 공통 WebSocket 사용 -->
@@ -17,100 +18,141 @@
 
 <main class="container">
     <h1 class="mt-4 mb-3">채팅 관리</h1>
-    <p>[[${chatRoomDtoList}]]</p>
-    <p>[[${roomIdList}]]</p>
     <table class="table table-hover">
         <thead>
         <tr>
-            <th>읽음표시</th>
             <th>닉네임</th>
-            <th>메세지</th>
+            <th>메시지</th> <!-- ✅ 최신 메시지 표시 -->
         </tr>
         </thead>
         <tbody>
         <tr th:each="chatRoom : ${chatRoomDtoList}"
             th:data-room-id="${chatRoom.roomId}"
             th:data-room-name="${chatRoom.roomName}"
-        >
-
-            <!-- 읽음 여부 -->
-            <td>
-                <span class="unread-dot rounded-circle"
-                      th:classappend="${chatRoom.chatMessage != null and !chatRoom.chatMessage.readCheck} ? 'bg-danger' : 'bg-secondary'"
-                      style="width: 10px; height: 10px; display: inline-block;">
-                </span>
-            </td>
+            onclick="toggleChatBox(this)"
+            style="cursor: pointer;">
 
             <!-- 닉네임 -->
             <td th:text="${chatRoom.roomName}"></td>
 
-            <!-- 최신 메시지 -->
-            <td class="chat-preview" th:text="${chatRoom.chatMessage != null} ? ${chatRoom.chatMessage.message} : '새로운 메시지가 없습니다.'"></td>
-        </tr>
-
-        <!-- ✅ 클릭 시 나타나는 채팅창 -->
-        <tr th:each="chatRoom : ${chatRoomDtoList}" th:id="'chat-box-' + ${chatRoom.roomId}" style="display: none;">
-            <td colspan="3">
-                <div class="chat-box p-3 border rounded">
-                    <div th:id="'chatMessages-' + ${chatRoom.roomId}" class="chat-body mb-2"></div>
-                    <div class="chat-input d-flex">
-                        <input type="text" th:id="'chatMessage-' + ${chatRoom.roomId}" class="form-control" placeholder="메시지를 입력하세요...">
-                        <button class="btn btn-primary ms-2" th:attr="onclick='sendMessage(' + ${chatRoom.roomId} + ')'">전송</button>
-                    </div>
-                </div>
-            </td>
+            <!-- 최신 메시지 (여기에 최신 메시지 반영) -->
+            <td class="chat-preview">새로운 메시지가 없습니다.</td>
         </tr>
         </tbody>
     </table>
 </main>
 
-<script th:inline="javascript">
-    var roomIds = /*[[${roomIdList}]]*/ [];
-    var subscribedRooms = new Set(); // ✅ 중복 구독 방지
+<!-- ✅ 토글 버튼 클릭 시 나타나는 채팅창 -->
+<div id="chatWindow" class="chat-window">
+    <div class="chat-header" onclick="toggleChat()">1:1 채팅</div>
+    <div class="chat-body" id="chatBody"></div>
+    <div class="chat-input">
+        <input type="text" id="chatMessage" placeholder="메시지를 입력하세요...">
+        <button onclick="sendMessage()">전송</button>
+    </div>
+</div>
 
-    function subscribeToRooms() {
+<script th:inline="javascript">
+    var roomId = null;
+    var nickName = null;
+    var receivedMessages = {}; // ✅ 각 방(roomId)별 메시지 저장
+
+    // ✅ 메시지를 리스트에 저장하고 UI 업데이트
+    function storeMessage(message) {
+        if (!receivedMessages[message.roomId]) {
+            receivedMessages[message.roomId] = [];
+        }
+        receivedMessages[message.roomId].push(message);
+
+        updateChatRoomUI(message.roomId);
+    }
+
+    // ✅ 채팅방 목록 UI에서 마지막 메시지 업데이트
+    function updateChatRoomUI(roomId) {
+        var chatPreview = document.querySelector(`[data-room-id='${roomId}'] .chat-preview`);
+        if (!chatPreview) return;
+
+        var lastMessage = receivedMessages[roomId]?.length
+            ? receivedMessages[roomId][receivedMessages[roomId].length - 1].message
+            : "새로운 메시지가 없습니다.";
+
+        chatPreview.textContent = lastMessage;
+    }
+
+    // ✅ 메시지를 화면에 추가
+    function displayMessage(message) {
+        var chatBody = document.getElementById("chatBody");
+        var messageElement = document.createElement("div");
+
+        // ✅ 내가 보낸 메시지는 오른쪽, 상대방 메시지는 왼쪽
+        var isMine = (message.sender === nickName);
+        messageElement.classList.add("chat-message", isMine ? "mine" : "other");
+
+        messageElement.innerHTML = message.message;
+        chatBody.appendChild(messageElement);
+        chatBody.scrollTop = chatBody.scrollHeight;
+
+        storeMessage(message); // ✅ 메시지를 저장하고 UI 업데이트
+    }
+
+    // ✅ 채팅창 토글 (채팅창 열고 닫기)
+    function toggleChatBox(row) {
+        roomId = row.getAttribute("data-room-id");
+        var chatWindow = document.getElementById("chatWindow");
+
+        chatWindow.style.display = (chatWindow.style.display === "flex") ? "none" : "flex";
+
+        if (!subscribedRooms.has(roomId)) {
+            subscribedRooms.add(roomId);
+            subscribeToRoom(roomId);
+        }
+    }
+
+    // ✅ 메시지를 서버로 전송
+    function sendMessage() {
+        var messageInput = document.getElementById("chatMessage");
+        var message = messageInput.value.trim();
+        if (!message || !stompClient || !stompClient.connected) return;
+
+        var chatMessage = {
+            roomId: roomId,
+            sender: nickName,
+            message: message
+        };
+
+        stompClient.send("/pub/message", {}, JSON.stringify(chatMessage));
+        messageInput.value = "";
+    }
+
+    // ✅ 특정 채팅방을 구독하여 메시지 수신
+    function subscribeToRoom(roomId) {
         if (!stompClient || !stompClient.connected) {
-            console.warn("🚨 WebSocket이 아직 연결되지 않음. 1초 후 다시 시도.");
-            setTimeout(subscribeToRooms, 1000);
+            setTimeout(() => subscribeToRoom(roomId), 1000);
             return;
         }
 
-        console.log("✅ [관리자 페이지] 기존 WebSocket을 이용하여 채팅방 구독 시작");
-        roomIds.forEach(function (roomId) {
-            if (!subscribedRooms.has(roomId)) {  // ✅ 중복 구독 방지
-                stompClient.subscribe("/sub/chat/room/" + roomId, function (message) {
-                    var receivedMessage = JSON.parse(message.body);
-                    console.log(`📩 [관리자] 새로운 메시지 수신! roomId=${roomId}`, receivedMessage);
+        if (subscribedRooms.has(roomId)) return;
+        subscribedRooms.add(roomId);
 
-                    // ✅ 관리자 페이지에서 수신한 메시지 로그 출력 (추후 UI 반영 가능)
-                    console.log(`[📩 채팅 도착] ${receivedMessage.sender}: ${receivedMessage.message}`);
-
-                    // ✅ 읽음 처리 예제 (UI 반영 가능)
-                    markAsRead(roomId);
-                });
-
-                subscribedRooms.add(roomId); // ✅ 구독 완료된 채팅방 추가
-                console.log(`✅ 채팅방 구독 완료: roomId=${roomId}`);
-            }
+        stompClient.subscribe(`/sub/chat/room/${roomId}`, function (message) {
+            var receivedMessage = JSON.parse(message.body);
+            displayMessage(receivedMessage);
         });
     }
 
-    // ✅ 읽음 처리 함수 (UI 업데이트 가능)
-    function markAsRead(roomId) {
-        var unreadDot = document.querySelector(`[data-room-id='${roomId}'] .unread-dot`);
-        if (unreadDot) {
-            unreadDot.classList.remove("bg-danger");
-            unreadDot.classList.add("bg-secondary"); // ✅ 읽음 처리 (회색 점)
-        }
-    }
-
-    // ✅ 페이지 로드 시 채팅방 구독 실행
     window.addEventListener("load", function () {
-        if (window.location.pathname.includes("/admin/chatmanagement")) {
-            console.log("📌 [관리자 페이지] 특정 방 구독 실행");
-            subscribeToRooms();
-        }
+        fetch('/member/api/member/roomId')
+            .then(response => response.json())
+            .then(data => {
+                if (data.roomId !== "0") {
+                    roomId = data.roomId;
+                    nickName = data.nickName;
+                    subscribeToRoom(roomId);
+                }
+            });
     });
+
+
 </script>
 
 <script src="https://code.jquery.com/jquery-3.4.1.js"></script>

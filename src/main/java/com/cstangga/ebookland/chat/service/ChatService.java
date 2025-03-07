@@ -73,15 +73,14 @@ public class ChatService {
         return chatRoomEntity;
     }
 
-    public void sendMessage(ChatMessageDto dto) {
+    public void sendMessage(ChatMessageDto messageDto) {
         log.info("service /sendMessage");
-        log.info("dto = {}",dto);
+        log.info("messageDto = {}",messageDto);
         // 이 부분에 DB에 저장
         // 채팅방을 구독했다 = 채팅방에 들어간 멤버
-        messagingTemplate.convertAndSend("/sub/chat/room"+dto.getRoomId(),dto);
+        messagingTemplate.convertAndSend("/sub/chat/room/"+messageDto.getRoomId(),messageDto);
         // -> stomp로 보내고, stomp가 프론트로 dto를 보낸다
         // 그전에 프론트에서는 websocket 연결 gate를 만들고 활성화 시켜놔야 한다
 
-        messagingTemplate.convertAndSend("/sub/chat/admin", dto); // 관리자가 전체 메세지를 구독함
     }
 }

@@ -1,66 +1,133 @@
-.chat-icon {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #007bff;
-    color: white;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 24px;
-}
-
+/* ✅ 공통 채팅창 스타일 */
 .chat-window {
     position: fixed;
-    bottom: 80px;
+    bottom: 80px; /* ✅ 채팅 아이콘 위에 배치 */
     right: 20px;
-    width: 25%;
-    height: 30%;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    height: 600px; /* ✅ 채팅창 크기 조절 */
     display: none;
     flex-direction: column;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* ✅ 내부 요소가 넘치지 않도록 처리 */
 }
 
+/* ✅ 공통 채팅창 헤더 */
 .chat-header {
-    background: #007bff;
-    color: white;
     padding: 10px;
+    font-weight: bold;
     text-align: center;
+    cursor: pointer;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    cursor: pointer;
+    background: #007bff; /* 기본 헤더 색상 */
+    color: white;
 }
 
+/* ✅ 관리자 페이지에서는 헤더 색상 변경 */
+.admin-page .chat-header {
+    background: #dc3545; /* 빨강 */
+}
+
+/* ✅ 공통 채팅 메시지 영역 (스크롤 가능) */
 .chat-body {
-    flex: 1;
+    flex: 1; /* ✅ 입력창 제외한 모든 공간 차지 */
+    overflow-y: auto; /* ✅ 스크롤 가능 */
     padding: 10px;
-    overflow-y: auto;
-    max-height: 300px;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
+/* ✅ 공통 채팅 입력창 (하단 고정) */
 .chat-input {
+    position: absolute;
+    bottom: 0; /* ✅ 아래에 고정 */
+    width: 100%; /* ✅ 채팅창 너비 맞춤 */
     display: flex;
-    border-top: 1px solid #ccc;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    background: white;
 }
 
 .chat-input input {
     flex: 1;
-    padding: 10px;
-    border: none;
-    border-bottom-left-radius: 10px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
 }
 
 .chat-input button {
+    margin-left: 10px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
     background: #007bff;
     color: white;
-    border: none;
-    padding: 10px;
-    border-bottom-right-radius: 10px;
+}
+
+/* ✅ 관리자 페이지에서는 버튼 색상 변경 */
+.admin-page .chat-input button {
+    background: #dc3545;
+}
+
+/* ✅ 공통 채팅 메시지 스타일 */
+.chat-message {
+    padding: 8px 12px;
+    border-radius: 10px;
+    max-width: 70%;
+    word-wrap: break-word;
+    display: flex;
+}
+
+/* ✅ 내가 보낸 메시지 (오른쪽 정렬) */
+.chat-message.mine {
+    background-color: #007bff; /* 파란색 */
+    color: white;
+    text-align: right;
+    align-self: flex-end;
+    justify-content: flex-end;
+    border-top-right-radius: 0;
+}
+
+/* ✅ 상대방이 보낸 메시지 (왼쪽 정렬) */
+.chat-message.other {
+    background-color: #e9ecef; /* 회색 */
+    color: black;
+    text-align: left;
+    align-self: flex-start;
+    justify-content: flex-start;
+    border-top-left-radius: 0;
+}
+
+/* ✅ 채팅 아이콘 (오른쪽 하단 고정) */
+.chat-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px; /* ✅ 오른쪽 정렬 */
+    background-color: #007bff;
+    color: white;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    text-align: center;
+    line-height: 50px;
+    border-radius: 50%;
     cursor: pointer;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* ✅ 관리자 페이지에서는 아이콘 색상 변경 */
+.admin-page .chat-icon {
+    background-color: #dc3545;
+}
+
+/* ✅ 스크롤이 chat-body 영역 내에서만 가능하도록 조정 */
+.chat-window .chat-body {
+    max-height: calc(100% - 60px); /* ✅ chat-input 크기 제외 */
+    overflow-y: auto;
 }

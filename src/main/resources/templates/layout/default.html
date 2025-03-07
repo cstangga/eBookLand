@@ -1,5 +1,5 @@
 <!doctype html>
-<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html class="member-page" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
@@ -29,7 +29,7 @@
     💬
 </div>
 
-<!-- ✅ 1:1 채팅창 -->
+<!-- ✅ 회원 채팅창 -->
 <div class="chat-window" id="chatWindow">
     <div class="chat-header" onclick="toggleChat()">1:1 채팅</div>
     <div class="chat-body" id="chatBody"></div>
@@ -38,16 +38,21 @@
         <button onclick="sendMessage()">전송</button>
     </div>
 </div>
-
 <script>
     var roomId = null;
     var nickName = null;
 
-    // ✅ 채팅창 토글
+    // ✅ 채팅창 토글 (버튼 옆에 위치)
     function toggleChat() {
         var chatWindow = document.getElementById("chatWindow");
-        chatWindow.style.display = (chatWindow.style.display === "flex" ? "none" : "flex");
+
+        if (chatWindow.style.display === "flex") {
+            chatWindow.style.display = "none"; // 닫기
+        } else {
+            chatWindow.style.display = "flex"; // 열기
+        }
     }
+
 
     // ✅ 회원 정보 가져오기 및 WebSocket 연결
     function fetchUserInfoAndConnect() {
@@ -73,7 +78,9 @@
             .catch(error => console.error("❌ Fetch error:", error));
     }
 
-    // ✅ 특정 채팅방 구독 (WebSocket 연결 후 실행)
+    // 특정방 구독(회원 : 관리자 방 )
+    var subscribedRooms = new Set(); // ✅ 구독된 방을 저장
+
     function subscribeToRoom(roomId) {
         if (!stompClient || !stompClient.connected) {
             console.warn(`🚨 WebSocket이 아직 연결되지 않음. ${roomId}번 방 구독 대기`);
@@ -81,24 +88,42 @@
             return;
         }
 
+        // ✅ 이미 구독한 방인지 확인
+        if (subscribedRooms.has(roomId)) {
+            console.log(`🚫 이미 구독된 채팅방: roomId=${roomId}`);
+            return;
+        }
+
         console.log(`📩 [회원] 채팅방 구독: roomId=${roomId}`);
 
         stompClient.subscribe(`/sub/chat/room/${roomId}`, function (message) {
             var receivedMessage = JSON.parse(message.body);
-            console.log(`📩 새 메시지 수신:`, receivedMessage);
+            console.log(`📩 [회원] 새 메시지 수신 (운영자로부터):`, receivedMessage);
             displayMessage(receivedMessage);
         });
+
+        subscribedRooms.add(roomId);
     }
+
 
     // ✅ 메시지 화면에 추가
     function displayMessage(message) {
         var chatBody = document.getElementById("chatBody");
         var messageElement = document.createElement("div");
 
-        messageElement.innerHTML = `<strong>${message.sender}:</strong> ${message.message}`;
+        // ✅ 내가 보낸 메시지는 오른쪽, 상대방이 보낸 메시지는 왼쪽
+        var isMine = (message.sender === nickName);
+        messageElement.classList.add("chat-message", isMine ? "mine" : "other");
+
+        // ✅ 메시지만 표시
+        messageElement.innerHTML = message.message;
         chatBody.appendChild(messageElement);
-        chatBody.scrollTop = chatBody.scrollHeight; // 자동 스크롤
+
+        // ✅ 최신 메시지로 자동 스크롤
+        chatBody.scrollTop = chatBody.scrollHeight;
     }
+
+
 
     // ✅ 메시지 전송
     function sendMessage() {
@@ -106,15 +131,21 @@
         var message = messageInput.value.trim();
         if (!message || !stompClient || !stompClient.connected) return;
 
+        console.log("📤 [회원] 메시지 전송:", message);
+
         var chatMessage = {
             roomId: roomId,
-            sender: nickName,
+            sender: nickName, // 현재 로그인한 회원이 보낸 메시지
             message: message
         };
 
+        // ✅ 서버로 메시지 전송 (displayMessage() 직접 호출 제거)
         stompClient.send("/pub/message", {}, JSON.stringify(chatMessage));
+
+        // ✅ 메시지는 서버에서 받아 처리되므로, 직접 화면에 추가하지 않음
         messageInput.value = "";
     }
+
 
     // ✅ Enter 키로 메시지 전송
     document.getElementById("chatMessage").addEventListener("keypress", function (event) {
@@ -129,8 +160,8 @@
         console.log("📌 [회원 페이지] WebSocket 연결 실행");
         fetchUserInfoAndConnect();
     });
-
 </script>
+
 
 <!-- ✅ 필수 스크립트 -->
 <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
