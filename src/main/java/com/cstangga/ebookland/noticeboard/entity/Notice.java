@@ -31,6 +31,9 @@ public class Notice {
     @Column(name = "contents",columnDefinition = "LONGTEXT")
     private String contents;
 
+    @OneToOne(mappedBy = "notice", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Recommend recommend;
+
     @Column(name = "create_at")
     @CreationTimestamp
     private LocalDateTime createAt;
@@ -50,7 +53,10 @@ public class Notice {
                 .contents(this.contents)
                 .createAt(this.createAt)
                 .views(this.views)
-                .title(this.title).build();
+                .title(this.title)
+                .likes(this.recommend !=null ?this.recommend.getDisLikes() : 0)
+                .disLikes(this.recommend !=null ? this.recommend.getDisLikes() : 0)
+                .relativeTime(relativeTime()).build();
     }
 
     public String relativeTime() {
@@ -68,5 +74,11 @@ public class Notice {
         } else {
             return createAt.format(DateTimeFormatter.ofPattern("MM-dd"));
         }
+    }
+
+    public void update(NoticeDto dto) {
+        this.title=dto.getTitle();
+        this.contents=dto.getContents();
+        this.updateAt=LocalDateTime.now();
     }
 }

@@ -1,9 +1,10 @@
 package com.cstangga.ebookland.noticeboard.repository;
 
-import com.cstangga.ebookland.freeboard.entity.Post;
-import com.cstangga.ebookland.noticeboard.dto.NoticeDto;
+
 import com.cstangga.ebookland.noticeboard.entity.Notice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,5 +14,6 @@ import java.util.List;
 public interface NoticeRepository extends JpaRepository<Notice, String > {
     List<Notice> findNoticeByTitleContaining(String title);
 
-    Notice findNoticeById(long noticeId);
+    @Query("SELECT n FROM notice n LEFT JOIN FETCH n.recommend WHERE n.id = :noticeId")
+    Notice findNoticeById(@Param("noticeId")long noticeId);
 }

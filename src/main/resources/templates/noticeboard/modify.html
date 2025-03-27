@@ -44,28 +44,23 @@
         .btn-submit:hover {
             background-color: #0056b3;
         }
-
-        .member-id-info {
-            text-align: right;
-            font-size: 14px;
-            color: #6c757d;
-            margin-bottom: 10px;
-        }
     </style>
 </head>
 <body>
 <main layout:fragment="main" class="container">
     <div class="form-container">
         <h2>공지사항</h2>
-        <form th:action="@{/noticeboard/addNotice}" method="post" onsubmit="return checkPost()">
+        <form th:action="@{/noticeboard/update}" method="post" onsubmit="return checkPost()">
+            <input type="hidden" name="noticeId" th:value="${dto.noticeId}">
+
             <div class="mb-3">
                 <label for="title" class="form-label">제목</label>
-                <input type="text" name="title" id="title" class="form-control" required>
+                <input type="text" th:value="${dto.title}" name="title" id="title" class="form-control" required>
             </div>
 
             <div class="mb-3">
                 <label for="contents" class="form-label">내용</label>
-                <textarea name="contents" id="contents" rows="6" class="form-control" required></textarea>
+                <textarea name="contents" th:text="${dto.contents}" id="contents" rows="6" class="form-control" required></textarea>
             </div>
 
             <button type="submit" class="btn-submit">완료</button>

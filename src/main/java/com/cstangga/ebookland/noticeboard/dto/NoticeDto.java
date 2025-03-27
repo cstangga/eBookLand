@@ -1,5 +1,6 @@
 package com.cstangga.ebookland.noticeboard.dto;
 
+import com.cstangga.ebookland.member.entity.Member;
 import com.cstangga.ebookland.noticeboard.entity.Notice;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,17 +20,10 @@ public class NoticeDto {
     private LocalDateTime createAt;
     private long views;
     private String relativeTime;
-
-
-    public NoticeDto(Notice entity){
-        this.noticeId=entity.getId();
-        this.title=entity.getTitle();
-        this.contents=entity.getContents();
-        this.createAt=entity.getCreateAt();
-        this.views=entity.getViews();
-        this.relativeTime=entity.relativeTime();
-
-    }
+    private long likes;
+    private long disLikes;
+    private Member member;
+    private Notice notice;
 
     public Notice dtoToEntity() {
        return Notice.builder()
@@ -37,6 +31,7 @@ public class NoticeDto {
                 .title(this.title)
                 .contents(this.contents)
                 .createAt(LocalDateTime.now())
-                .views(this.views).build();
+                .views(this.views)
+               .build();
     }
 }

@@ -1,7 +1,6 @@
 package com.cstangga.ebookland.noticeboard.service;
 
-import com.cstangga.ebookland.freeboard.dto.PostDto;
-import com.cstangga.ebookland.freeboard.entity.Post;
+
 import com.cstangga.ebookland.noticeboard.dto.NoticeDto;
 import com.cstangga.ebookland.noticeboard.entity.Notice;
 import lombok.RequiredArgsConstructor;
@@ -45,13 +44,32 @@ public class NoticeService {
 
     // 게시글 업데이트 용도
     public NoticeDto findNoticeById(long noticeId) {
-        log.info("PostService / findPostById");
+        log.info("NoticeService / findPostById");
 
         Notice entity = noticeRepository.findNoticeById(noticeId);
+        log.info("entity = {}",entity);
 
         return entity.toDto();
     }
-}
 
+    public Notice update(NoticeDto dto) {
+        Notice entity=noticeRepository.findNoticeById(dto.getNoticeId());
+        entity.update(dto);
+        return noticeRepository.save(entity);
+
+    }
+
+    public void delete(long noticeId) {
+        log.info("NoticeService / delete / {}",noticeId);
+        noticeRepository.deleteById(String.valueOf(noticeId));
+    }
+
+    public void recommendCheck(String recommend, String user, long noticeId) {
+        // user, noticeId로 가져온 recommend 속성에 like, dislike 와 매개변수로 받은 recommend와 비교
+        // 총 if문은 3개
+        // 1. like, dislike == 0 , 0리턴 -> 다시 controller에서 각 recommend로 증가한다
+        // 2. like =
+    }
+}
 
 

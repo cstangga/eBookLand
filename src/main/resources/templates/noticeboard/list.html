@@ -95,7 +95,7 @@
 </head>
 <body>
 <main layout:fragment="main" class="container board-container">
-    <h2 class="text-center">자유게시판</h2>
+    <h2 class="text-center">공지사항</h2>
 
     <!-- 검색 기능 + 글쓰기 버튼 -->
 
@@ -129,7 +129,7 @@
             <td class="col-title">
                 <a th:href="@{|/noticeboard/detail/${dto.noticeId}|}" th:text="${dto.title}" class="title-link"></a>
             </td>
-            <td class="col-date" th:text="${dto.createAt}"></td>
+            <td class="col-date" th:text="${dto.relativeTime}"></td>
             <td class="col-views" th:text="${dto.views}"></td>
         </tr>
         </tbody>
