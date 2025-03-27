@@ -31,7 +31,7 @@ public class PostService {
     public List<PostDto> findAllPost() {
         log.info("PostService / findAllPost");
         List<PostDto> postDtoList=new ArrayList<>();
-        List<Post> postList = postRepository.findAll();
+        List<Post> postList = postRepository.findAll(); // 스트림으로 변경해보자
 
         for(Post entity:postList){
             postDtoList.add(entity.toDto());

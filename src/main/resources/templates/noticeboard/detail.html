@@ -1,5 +1,5 @@
 <!doctype html>
-<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layout/default}">
 <head>
     <meta charset="UTF-8">
@@ -80,7 +80,7 @@
         <button type="button" class="btn btn-danger" onclick="deletePost()">삭제하기</button>
     </div>
 
-    <div class="btn-container" th:if="${#authentication.principal.member.id} != ${dto.member.id}">
+    <div class="btn-container" sec:authorize="hasRole('MEMBER')">
         <button type="button" class="btn btn-danger" onclick="likes()">추천</button>
     </div>
 
@@ -98,13 +98,13 @@
 
         if (confirm('게시물을 삭제하시겠습니까?')) {
             $.ajax({
-                url: '/freeboard/deletePost',
+                url: '/noticeboard/deletePost',
                 type: 'POST',
                 data: { postId: postId }
             }).done(function (data) {
                 if (data === 1) { // 삭제 성공
                     alert('삭제가 완료되었습니다.');
-                    window.location.href = "/freeboard/list"; // 삭제 후 이동
+                    window.location.href = "/noticeboard/list"; // 삭제 후 이동
                 } else { // 삭제 실패
                     alert('삭제에 실패했습니다.');
                 }
@@ -116,27 +116,27 @@
     }
 
     function likes() {
-        const postId = document.getElementById('postId').value;
+        const noticeId = document.getElementById('noticeId').value;
         const memberId=[${#authentication.principal.member.id}];
         console.log("추천하기 함수\n");
-        console.log('postId:', postId);
+        console.log('postId:', noticeId);
         console.log('memberId :', memberId);
 
-            $.ajax({
-                url: '/freeboard/likes',
-                type: 'POST',
-                data: { postId: postId }
-            }).done(function (data) {
-                if (data === 1) { // 삭제 성공
-                    alert('삭제가 완료되었습니다.');
-                    window.location.href = "/freeboard/list"; // 삭제 후 이동
-                } else { // 삭제 실패
-                    alert('삭제에 실패했습니다.');
-                }
-            }).fail(function (error) {
-                console.error('삭제 요청 실패:', error);
-                alert('서버 오류로 인해 삭제할 수 없습니다.');
-            });
+        $.ajax({
+            url: '/noticeboard/likes',
+            type: 'POST',
+            data: { noticeIdnoticeId: noticeId }
+        }).done(function (data) {
+            if (data === 1) { // 삭제 성공
+                alert('삭제가 완료되었습니다.');
+                window.location.href = "/noticeboard/list"; // 삭제 후 이동
+            } else { // 삭제 실패
+                alert('삭제에 실패했습니다.');
+            }
+        }).fail(function (error) {
+            console.error('삭제 요청 실패:', error);
+            alert('서버 오류로 인해 삭제할 수 없습니다.');
+        });
 
     }
 </script>

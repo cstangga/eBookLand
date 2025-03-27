@@ -29,7 +29,7 @@ public class PostController {
 
     @GetMapping("/list")
     public void list(Model model) {
-        log.info("GET /freeboard/list");
+        log.info("GET /freeboard / list");
         List<PostDto> postDtoList=postService.findAllPost();
         log.info("postDtoList = {}",postDtoList);
         model.addAttribute("postDtoList", postDtoList);
@@ -38,8 +38,12 @@ public class PostController {
     @GetMapping("/detail/{postId}")
     public String detail(@PathVariable("postId") long postId, Model model) {
         log.info("POST /freeboard/detail/{}",postId);
+        // 여기서 해당 게시글의 조회수가 올라간다
+
         PostDto dto=postService.findPostById(postId);
+
         model.addAttribute("dto", dto);
+
         return "/freeboard/detail";
     }
 
@@ -51,6 +55,19 @@ public class PostController {
         log.info("postDto = {}", postDto);
         log.info("등록 후 Post={}",entity);
         return "redirect:/freeboard/list";
+    }
+
+    @GetMapping("/likes")
+    public void likes(@RequestParam("postId") long postId) {
+        log.info("GET / freeboard/likes/{}",postId);
+    }
+
+    // 전에도 추천을 했는지 검사하는 메소드
+    @GetMapping("/checkLikes")
+    public String checkLikes(@RequestParam("postId")long postId, @RequestParam("memberId") long memberId){
+        log.info("GET / freeboard/checkLikes");
+        log.info("postId = {}, memberId = {}",postId,memberId);
+        return null;
     }
 
     //게시글 등록 페이지
