@@ -1,6 +1,8 @@
 package com.cstangga.ebookland.noticeboard.entity;
 
 import com.cstangga.ebookland.noticeboard.dto.NoticeDto;
+import com.cstangga.ebookland.recommend.entity.Recommend;
+import com.cstangga.ebookland.recommend.entity.RecommendType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +14,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "notice")
 @Table(name = "tbl_notice")
@@ -31,8 +35,8 @@ public class Notice {
     @Column(name = "contents",columnDefinition = "LONGTEXT")
     private String contents;
 
-    @OneToOne(mappedBy = "notice", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Recommend recommend;
+    @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL)
+    private List<Recommend> recommends = new ArrayList<>();
 
     @Column(name = "create_at")
     @CreationTimestamp
@@ -42,20 +46,27 @@ public class Notice {
     @UpdateTimestamp
     private LocalDateTime updateAt;
 
-    @Column(name = "views")
+    @Column(name = "views", columnDefinition = "BIGINT DEFAULT 0")
     @Builder.Default // 특정 값으로 초기화 하고 싶을 때 쓴다, 일일이 dto가 들어왔을 때 set하는 거 보다 만들어질 때 초기화 한다
     private long views=0;
 
 
     public NoticeDto toDto( ) {
+        long likeCount = this.recommends.stream()
+                .filter(type -> type.getType() == RecommendType.LIKES)
+                .count();
+
+        long dislikeCount = this.recommends.stream()
+                .filter(r -> r.getType() == RecommendType.DISLIKES)
+                .count();
         return new NoticeDto().builder()
                 .noticeId(this.id)
                 .contents(this.contents)
                 .createAt(this.createAt)
                 .views(this.views)
                 .title(this.title)
-                .likes(this.recommend !=null ?this.recommend.getDisLikes() : 0)
-                .disLikes(this.recommend !=null ? this.recommend.getDisLikes() : 0)
+                .likes(likeCount)
+                .disLikes(dislikeCount)
                 .relativeTime(relativeTime()).build();
     }
 

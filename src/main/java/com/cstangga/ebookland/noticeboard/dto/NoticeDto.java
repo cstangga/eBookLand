@@ -25,13 +25,12 @@ public class NoticeDto {
     private Member member;
     private Notice notice;
 
+    // 생성, 수정 할때만 사용하지 않을까??
     public Notice dtoToEntity() {
        return Notice.builder()
                 .id(this.noticeId)
                 .title(this.title)
                 .contents(this.contents)
-                .createAt(LocalDateTime.now())
-                .views(this.views)
                .build();
     }
 }

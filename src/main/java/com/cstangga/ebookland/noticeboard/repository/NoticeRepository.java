@@ -14,6 +14,6 @@ import java.util.List;
 public interface NoticeRepository extends JpaRepository<Notice, String > {
     List<Notice> findNoticeByTitleContaining(String title);
 
-    @Query("SELECT n FROM notice n LEFT JOIN FETCH n.recommend WHERE n.id = :noticeId")
-    Notice findNoticeById(@Param("noticeId")long noticeId);
+    @Query("SELECT n FROM notice n LEFT JOIN FETCH n.recommends WHERE n.id = :noticeId")
+    Notice findNoticeById(@Param("noticeId") long noticeId);
 }

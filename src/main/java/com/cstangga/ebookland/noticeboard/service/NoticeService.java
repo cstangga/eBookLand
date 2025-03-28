@@ -42,7 +42,6 @@ public class NoticeService {
                 .toList();
     }
 
-    // 게시글 업데이트 용도
     public NoticeDto findNoticeById(long noticeId) {
         log.info("NoticeService / findPostById");
 
@@ -64,12 +63,6 @@ public class NoticeService {
         noticeRepository.deleteById(String.valueOf(noticeId));
     }
 
-    public void recommendCheck(String recommend, String user, long noticeId) {
-        // user, noticeId로 가져온 recommend 속성에 like, dislike 와 매개변수로 받은 recommend와 비교
-        // 총 if문은 3개
-        // 1. like, dislike == 0 , 0리턴 -> 다시 controller에서 각 recommend로 증가한다
-        // 2. like =
-    }
 }
 
 

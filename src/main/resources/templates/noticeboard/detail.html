@@ -90,11 +90,11 @@
     <div class="reaction-buttons">
         <button class="btn btn-primary btn-reaction" onclick="likes()">
             <span>★ 추천</span>
-            <span th:text="${dto.likes}">0</span>
+            <span th:text="${dto.likes}"></span>
         </button>
         <button class="btn btn-danger btn-reaction" onclick="disLikes()">
             <span>✖ 비추천</span>
-            <span th:text="${dto.disLikes}">0</span>
+            <span th:text="${dto.disLikes}"></span>
         </button>
     </div>
 
@@ -142,8 +142,12 @@
                 alert("비회원은 추천/비추천이 불가능합니다");
                 return;
             }
+            if(user==='a@a'){
+                alert("관리자는 추천/비추천이 불가능합니다");
+                return;
+            }
             $.ajax({
-                url: '/noticeboard/likes',
+                url: '/recommend/likes',
                 type: 'POST',
                 data: {
                     noticeId: noticeId,
@@ -151,6 +155,12 @@
                 }
             }).done(function (data) {
                 console.log(data);
+                if (data.success) {
+                    alert(data.message);  // 추천 완료
+                    location.reload();     // 새로고침해서 count 갱신
+                } else {
+                    alert(data.message);  // 이미 추천/비추천을 했습니다.
+                }
 
             }).fail(function (error) {
                 console.error('추천 요청 실패:', error);
@@ -171,9 +181,13 @@
                 alert("비회원은 추천/비추천이 불가능합니다");
                 return;
             }
+            if(user==='a@a'){
+                alert("관리자는 추천/비추천이 불가능합니다");
+                return;
+            }
 
             $.ajax({
-                url: '/noticeboard/disLikes',
+                url: '/recommend/disLikes',
                 type: 'POST',
                 data: {
                     noticeId: noticeId,
@@ -181,6 +195,12 @@
                 }
             }).done(function (data) {
                 console.log(data);
+                if (data.success) {
+                    alert(data.message);  // 추천 완료
+                    location.reload();     // 새로고침해서 count 갱신
+                } else {
+                    alert(data.message);  // 이미 추천/비추천을 했습니다.
+                }
             }).fail(function (error) {
                 alert('서버 오류로 인해 처리할 수 없습니다.');
             });

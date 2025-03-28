@@ -89,23 +89,4 @@ public class NoticeController {
         return "index"; // 아무 페이지나 return 해도 OK (템플릿 이름)
     }
 
-    /*
-    * true = 추천이 됨
-    * false = 추천 안됨(중복방지) -> 이미 하셧습니다 추천을 취소 하시겠습니까??
-    * Entity를 다시 생각해 봐야겟다
-    * */
-    @PostMapping("/disLikes")
-    public long disLikes(@RequestParam("user")String user, @RequestParam("noticeId") long noticeId){
-        log.info("POST / noticeboard / dislikes");
-        log.info("user = {}, noticeId = {}",user,noticeId);
-        noticeService.recommendCheck("disLikes",user,noticeId);
-        return 1;
-    }
-
-    @PostMapping("/likes")
-    public long likes(@RequestParam("user")String user, @RequestParam("noticeId") long noticeId){
-        log.info("POST / noticeboard / likes");
-        log.info("user = {}, noticeId = {}",user,noticeId);
-        return 1;
-    }
 }
