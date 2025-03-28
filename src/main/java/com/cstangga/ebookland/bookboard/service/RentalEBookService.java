@@ -1,5 +1,6 @@
 package com.cstangga.ebookland.bookboard.service;
 
+import com.cstangga.ebookland.bookboard.dto.BuyEBookDto;
 import com.cstangga.ebookland.bookboard.dto.RentalEBookDto;
 import com.cstangga.ebookland.bookboard.entity.Book;
 import com.cstangga.ebookland.bookboard.entity.RentalEbook;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -18,6 +20,12 @@ import java.util.List;
 public class RentalEBookService {
     private final RentalBookRepository rentalBookRepository;
     private final BookRepository bookRepository;
+
+    public boolean duplicatedCheck(RentalEBookDto dto){
+        Optional<RentalEbook> rentalEbook= Optional.ofNullable(rentalBookRepository.findRentalEbookByBookId(dto.getBookId()));
+        return rentalEbook.isEmpty();
+
+    }
 
     public void rentalBook(RentalEBookDto dto) {
         log.info("BookService rentalBook");

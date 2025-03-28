@@ -7,9 +7,12 @@ import com.cstangga.ebookland.bookboard.service.BookService;
 import com.cstangga.ebookland.bookboard.service.EBookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -20,13 +23,19 @@ public class EBookController {
     private final BookService bookService;
 
     @PostMapping("/buyEBook")
-    public String buyBook(@ModelAttribute BuyEBookDto dto)
+    public ResponseEntity<?> buyBook(@ModelAttribute BuyEBookDto dto)
     {
         log.info("POST /ebook/buyBook");
         log.info("dto = {}",dto);
-        BuyEbook buyEbookEntity=ebookService.buyEbook(dto);
-        log.info("buyEbookEntity = {}",buyEbookEntity);
-        return String.format("redirect:/bookboard/detail/%d",dto.getBookId());
+        if(ebookService.duplicatedCheck(dto)) {
+            BuyEbook buyEbookEntity = ebookService.buyEbook(dto);
+            log.info("buyEbookEntity = {}",buyEbookEntity);
+
+            return ResponseEntity.ok(Map.of("success", true, "message", "전자책 구매 완료"));
+        }
+        else {
+            return ResponseEntity.ok(Map.of("success", false, "message", "이미 전자책 구매를 했습니다."));
+        }
     }
 
     @GetMapping("/readBuyEBook/{bookId}")

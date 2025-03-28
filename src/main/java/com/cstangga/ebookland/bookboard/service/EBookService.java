@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,8 +20,15 @@ public class EBookService {
     private final BuyEbookRepository buyEbookRepository;
     private final BookRepository bookRepository;
 
+    public boolean duplicatedCheck(BuyEBookDto dto){
+        Optional<Book> book= Optional.ofNullable(bookRepository.findBookById(dto.getBookId()));
+        return book.isEmpty();
+
+    }
+
     public BuyEbook buyEbook(BuyEBookDto dto) {
         log.info("BookService buyEbook");
+
         Book book=bookRepository.findBookById(dto.getBookId());
         BuyEbook buyEbook=dto.dtoToEbookEntity(book);
         return buyEbookRepository.save(buyEbook);
@@ -28,6 +36,7 @@ public class EBookService {
 
     public List<BuyEBookDto> findAllEBookById(long id) {
         log.info("BookService findEBookById");
+        log.info("findAllByMemberId = {}",buyEbookRepository.findAllByMemberId(id));
         List<BuyEBookDto> buyEBookDtoList = new ArrayList<>();
 
         for(BuyEbook entity:buyEbookRepository.findAllByMemberId(id)){

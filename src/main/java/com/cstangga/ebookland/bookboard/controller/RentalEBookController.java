@@ -5,9 +5,12 @@ import com.cstangga.ebookland.bookboard.dto.RentalEBookDto;
 import com.cstangga.ebookland.bookboard.service.RentalEBookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -18,12 +21,18 @@ public class RentalEBookController {
 
     @PostMapping("/rentalEbook")
     @ResponseBody
-    public String rentalEbook(@ModelAttribute RentalEBookDto dto)
+    public ResponseEntity<?> rentalEbook(@ModelAttribute RentalEBookDto dto)
     {
         log.info("POST /bookboard/rentalEbook");
         log.info("dto = {}",dto);
-        rentalEBookService.rentalBook(dto);
-        return "success";
+        if(rentalEBookService.duplicatedCheck(dto)) {
+            rentalEBookService.rentalBook(dto);
+            return ResponseEntity.ok(Map.of("success", true, "message", "전자책 대여 완료"));
+
+        }else{
+            return ResponseEntity.ok(Map.of("success", false, "message", "이미 전자책 대여를 했습니다."));
+
+        }
     }
 
     @GetMapping("/readRentalEBook/{bookId}")

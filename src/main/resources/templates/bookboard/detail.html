@@ -289,8 +289,12 @@
                         totalPrice: totalPriceValue,
                     },
                     success: function(response) {
-                        alert("전자책 구매가 완료되었습니다.");
-                        location.reload();
+                        if (response.success) {
+                            alert(response.message);  // 구매 완료
+                            location.reload();
+                        } else {
+                            alert(response.message);  // 이미 구매함
+                        }
                     },
                     error: function(xhr, status, error) {
                         console.error("AJAX 요청 실패:", error);
@@ -340,8 +344,12 @@
                         totalPrice: totalPriceValue
                     },
                     success: function(response) {
-                        alert("대여가 완료되었습니다.");
-                        location.reload();
+                        if (response.success) {
+                            alert(response.message);  // 구매 완료
+                            location.reload();
+                        } else {
+                            alert(response.message);  // 이미 구매함
+                        }
                     },
                     error: function(xhr, status, error) {
                         console.error("AJAX 요청 실패:", error);

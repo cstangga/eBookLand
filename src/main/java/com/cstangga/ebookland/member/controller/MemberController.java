@@ -119,12 +119,14 @@ public class MemberController {
 
     @GetMapping("/mybook")
     public void myBook(@AuthenticationPrincipal AuthPrincipal authPrincipal, Model model) {
-        log.info("GET /bookboard/myBook");
+        log.info("GET /bookboard / myBook");
         log.info("principal = {}", authPrincipal.getUsername());
 
         long memberId=authPrincipal.getMember().getId();
+        log.info("memberId = {}",memberId);
         List<RentalEBookDto> rentalEBookDtoList = rentalEBookService.findAllRentalEbookById(memberId);
         List<BuyEBookDto> buyEBookDtoList = eBookService.findAllEBookById(memberId);
+        log.info("buyEBookDtoList = {}",buyEBookDtoList);
 
         model.addAttribute("rentalEBookDtoList",rentalEBookDtoList);
         model.addAttribute("buyEBookDtoList",buyEBookDtoList);
